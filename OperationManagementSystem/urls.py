@@ -15,9 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import TemplateView
+from . import views
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^system/', include('OperationManagementSystem.apps.system.urls')),
+    url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
+    url(r'^login/', views.LoginView.as_view(), name='login'),
 ]

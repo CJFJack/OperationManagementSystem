@@ -1,0 +1,97 @@
+{% extends '__base__.html' %}
+
+{% block content %}
+    {% if ecs_manage %}
+        <div class="app-title">
+            <div>
+                <h1><i class="fa fa-th-list"></i> ECS 管理</h1>
+                <p> 同步阿里云 ECS 基本信息、监控信息</p>
+            </div>
+            <ul class="app-breadcrumb breadcrumb side">
+                <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+                <li class="breadcrumb-item">系统管理</li>
+                <li class="breadcrumb-item active"><a href="#">ECS 管理</a></li>
+            </ul>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body">
+                        <table class="table table-hover table-bordered" id="sampleTable">
+                            <thead>
+                            <tr>
+                                <th>区域</th>
+                                <th>网络类型</th>
+                                <th>ECS名称</th>
+                                <th>实例ID</th>
+                                <th>系统类型</th>
+                                <th>系统版本</th>
+                                <th>内网IP地址</th>
+                                <th>外网IP地址</th>
+                                <th>配置规格</th>
+                                <th>使用状态</th>
+                                <th>运行状态</th>
+                                <th>过期时间</th>
+                                <th>修改日期</th>
+                                <th>CPU使用率</th>
+                                <th>内存使用率</th>
+                                <th>磁盘使用率</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for ecs in ecs_manage %}
+                                <tr>
+                                    <td>{{ ecs.regionId }}</td>
+                                    <td>{{ ecs.networktype }}</td>
+                                    <td>{{ ecs.name }}</td>
+                                    <td>{{ ecs.instanceid }}</td>
+                                    <td>{{ ecs.ostype }}</td>
+                                    <td>{{ ecs.osname }}</td>
+                                    <td>{{ ecs.IP }}</td>
+                                    <td>{{ ecs.publicipaddress }}</td>
+                                    <td>CPU:{{ ecs.cpu }}核 内存:{{ ecs.memory }}G</td>
+                                    <td>
+                                        {% if ecs.status == 'Y' %}<span>启用</span>
+                                        {% else %}<span class="text-danger"><strong>禁用</strong></span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ ecs.instancestatus }}</td>
+                                    <td>{{ ecs.expiredtime }}</td>
+                                    <td>{{ ecs.modified_time }}</td>
+                                    <td>{{ ecs.recently_cpu }}</td>
+                                    <td>{{ ecs.recently_memory }}</td>
+                                    <td>{{ ecs.recently_disk_usage }}</td>
+                                    <td>
+
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="app-title">
+            <div>
+                <h1><i class="fa fa-dashboard"></i> ECS 管理</h1>
+                <p>No ECS are available.</p>
+            </div>
+            <ul class="app-breadcrumb breadcrumb">
+                <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+                <li class="breadcrumb-item">系统管理</li>
+                <li class="breadcrumb-item"><a href="#">ECS 管理</a></li>
+            </ul>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body">请先同步阿里云 ECS</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
