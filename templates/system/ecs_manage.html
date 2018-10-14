@@ -2,20 +2,41 @@
 
 {% block content %}
     {% if ecs_manage %}
+        {#        表格有数据时展示#}
         <div class="app-title">
+            {#            页面简介#}
             <div>
                 <h1><i class="fa fa-th-list"></i> ECS 管理</h1>
                 <p> 同步阿里云 ECS 基本信息、监控信息</p>
             </div>
+            {#            面包屑#}
             <ul class="app-breadcrumb breadcrumb side">
                 <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
                 <li class="breadcrumb-item">系统管理</li>
                 <li class="breadcrumb-item active"><a href="#">ECS 管理</a></li>
             </ul>
         </div>
+        {#        页面主要内容#}
         <div class="row">
             <div class="col-md-12">
                 <div class="tile">
+                    {#                    Loading 层#}
+                    <div class="overlay" style="display:none">
+                        <div class="m-loader mr-4">
+                            <svg class="m-circular" viewBox="25 25 50 50">
+                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4"
+                                        stroke-miterlimit="10"/>
+                            </svg>
+                        </div>
+                        <h3 class="l-text">Loading</h3>
+                    </div>
+                    {#                    按钮区域#}
+                    <div>
+                        <button class="btn btn-success" type="button" onclick="SyncAllECS()">同步所有ECS</button>
+                        <button class="btn btn-info" type="button">刷新所有ECS基础信息</button>
+                        <button class="btn btn-warning" type="button">刷新所有ECS监控数据</button>
+                    </div>
+                    {#                    表格数据区域#}
                     <div class="tile-body">
                         <table class="table table-hover table-bordered" id="sampleTable">
                             <thead>
@@ -74,11 +95,14 @@
             </div>
         </div>
     {% else %}
+        {#        表格没有数据时展示#}
         <div class="app-title">
+            {#            页面简介#}
             <div>
                 <h1><i class="fa fa-dashboard"></i> ECS 管理</h1>
                 <p>No ECS are available.</p>
             </div>
+            {#            面包屑#}
             <ul class="app-breadcrumb breadcrumb">
                 <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
                 <li class="breadcrumb-item">系统管理</li>
@@ -95,3 +119,40 @@
     {% endif %}
 {% endblock %}
 
+{% block custom_static %}
+    <!--引用jquery cdn-->
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        // Ajax 请求 csrf 验证
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+
+        //同步所有ECS
+        function SyncAllECS() {
+            let postUrl = "{% url 'system:sync_all_ecs_from_acs' %}";
+            {#let PageNumber = pagenumber;#}
+
+            {#jQuery('#body').showLoading();#}
+
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    {#WholePartialRefresh(pagenumber);#}
+                    {#$("#alert-div").css("display", "");#}
+                    {#$("#alert-div").attr("class", "alert alert-success");#}
+                    {#$("#alert-div").text("成功！同步所有ECS");#}
+                    setTimeout(function () {
+
+                    }, 20000);
+                }
+                else {
+                    alert("操作失败！" + data.message);
+                }
+                setTimeout(function () {
+                    {#jQuery('#body').hideLoading();#}
+                }, 300);
+            });
+        }
+
+    </script>
+{% endblock %}

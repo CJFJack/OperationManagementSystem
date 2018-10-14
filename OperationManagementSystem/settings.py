@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for OperationManagementSystem project.
 
@@ -131,3 +132,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     BASE_DIR + STATIC_URL,
 )
+
+# 阿里云API配置
+ACCESS_KEY_ID = 'ZAL5Z3Ee8KhyZ2U1'
+ACCESS_KEY_SECRET = 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe'

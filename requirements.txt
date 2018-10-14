@@ -1,2 +1,5 @@
 django
 django-simple-history
+aliyuncli
+aliyun-python-sdk-core
+aliyun-python-sdk-ecs
