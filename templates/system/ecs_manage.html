@@ -123,10 +123,6 @@
     <!--引用jquery cdn-->
     <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
     <script>
-        // Ajax 请求 csrf 验证
-        $.ajaxSetup({
-            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
-        });
 
         //同步所有ECS
         function SyncAllECS() {
