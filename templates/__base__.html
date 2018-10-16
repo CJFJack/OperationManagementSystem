@@ -31,7 +31,8 @@
         <li class="dropdown"><a class="app-nav__item" href="#" data-toggle="dropdown" aria-label="Open Profile Menu"><i
                 class="fa fa-user fa-lg"></i></a>
             <ul class="dropdown-menu settings-menu dropdown-menu-right">
-                <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fa fa-sign-out fa-lg"></i> Logout</a></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fa fa-sign-out fa-lg"></i> Logout</a>
+                </li>
             </ul>
         </li>
     </ul>
@@ -87,10 +88,9 @@
 </aside>
 
 <main class="app-content">
-{% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 </main>
 
-{% block custom_static %}{% endblock %}
 
 <!-- Essential JavaScripts for application to work-->
 <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
@@ -99,6 +99,8 @@
 <script src="{% static 'js/main.js' %}"></script>
 <!-- The JavaScript plugin to display page loading on top-->
 <script src="{% static 'js/plugins/pace.min.js' %}"></script>
+<!-- Page specific JavaScripts-->
+{% block custom_static %}{% endblock %}
 
 </body>
 </html>
