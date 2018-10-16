@@ -3,3 +3,4 @@ django-simple-history
 aliyuncli
 aliyun-python-sdk-core
 aliyun-python-sdk-ecs
+aliyun-python-sdk-cms
