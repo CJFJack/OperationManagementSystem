@@ -11,5 +11,7 @@ urlpatterns = [
     url(r'^sync_all_ecs_from_acs/$', views.sync_all_ecs_from_acs, name='sync_all_ecs_from_acs'),
     url(r'^update_all_ecs_info/$', views.update_all_ecs_info, name='update_all_ecs_info'),
     url(r'^ecs_table_refresh/$', views.ecs_table_refresh, name='ecs_table_refresh'),
-    url(r'^update_all_ecs_monitor/$', views.update_all_ecs_monitor, name='update_all_ecs_monitor')
+    url(r'^update_all_ecs_monitor/$', views.update_all_ecs_monitor, name='update_all_ecs_monitor'),
+    url(r'^application/$', views.ApplicationListView.as_view(), name='application_manage'),
+    url(r'^application_add/$', views.ApplicationAdd.as_view(), name='application_add')
 ]

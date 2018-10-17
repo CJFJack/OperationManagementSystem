@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 
 from django.views import generic
-from OperationManagementSystem.apps.system.models import ECS
+from OperationManagementSystem.apps.system.models import ECS, Application
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from acs_api.acs_sync_all_ecs import sync_all_ecs
@@ -13,8 +13,9 @@ from django.views.decorators.csrf import csrf_exempt
 from acs_api.acs_update_ecs_info import update_ecs_info
 from django.shortcuts import render
 from acs_api.acs_update_ecs_monitor import update_ecs_monitor
+from OperationManagementSystem.apps.system.forms import ApplicationForm
 
-import json
+import json, random
 
 app_name = 'system'
 
@@ -114,3 +115,42 @@ def update_all_ecs_monitor(request):
     for ecs in ECS.objects.all():
         update_one_ecs_monitor(request, ecs.id)
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ApplicationListView(generic.ListView):
+    model = Application
+    template_name = 'system/application_manage.html'
+    context_object_name = 'application_manage'
+
+    def get_queryset(self):
+        return Application.objects.order_by('fullname')
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ApplicationAdd(generic.View):
+    def get(self, request):
+        ecs_list = ECS.objects.all()
+        random_id = random.randint(10000000, 99999999)
+        return render(request, 'system/application_add.html', {'ecs_list': ecs_list, 'random_id': random_id})
+
+    def post(self, request):
+        application_form = ApplicationForm(request.POST)
+        if application_form.is_valid():
+            application_form.save(commit=True)
+            application = Application.objects.get(random_id=request.POST['random_id'])
+            application.modified_user = request.user.username
+            ecs_list = request.POST.getlist('select_ecs[]', '')
+            if ecs_list:
+                for ecs in ecs_list:
+                    ecs_obj = ECS.objects.get(name=ecs)
+                    application.ECS_lists.add(ecs_obj)
+            application.save()
+
+            return render(request, 'system/application_manage.html', {})
+        else:
+            return render(request, 'system/application_manage.html', {'application_form': application_form})
+
+
+
+

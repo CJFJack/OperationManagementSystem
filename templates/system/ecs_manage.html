@@ -96,8 +96,8 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ ecs.instance_status }}</td>
-                                    <td>{{ ecs.expired_time }}</td>
-                                    <td>{{ ecs.modified_time }}</td>
+                                    <td>{{ ecs.expired_time|date:"Y-m-d H:i:s" }}</td>
+                                    <td>{{ ecs.modified_time|date:"Y-m-d H:i:s" }}</td>
                                     <td>{{ ecs.recently_cpu }}</td>
                                     <td>{{ ecs.recently_memory }}</td>
                                     <td>{{ ecs.recently_disk_usage }}</td>

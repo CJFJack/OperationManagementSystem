@@ -1,0 +1,87 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    {#        表格有数据时展示#}
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> 应用管理</h1>
+            {% if application_manage %}
+                <p> IIS 站点、Java应用列表</p>
+            {% else %}
+                <p>No applications are available.</p>
+            {% endif %}
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">系统管理</li>
+            <li class="breadcrumb-item active"><a href="#">应用管理</a></li>
+        </ul>
+    </div>
+    {#        操作结果提示栏区域#}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="bs-component">
+                <div class="alert alert-dismissible" id="notice" style="display: none;">
+                    <button class="close" type="button" data-dismiss="alert">×</button>
+                    <h4></h4>
+                    <p><a class="alert-link" href="#"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {#        按钮区域#}
+    <div>
+        <button class="btn btn-success" type="button" onclick="window.location.href='{% url "system:application_add" %}'">添加应用</button>
+    </div>
+    {% if application_manage %}
+        {#        表格区域#}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    {#                    Loading 遮盖层#}
+                    <div class="overlay" style="display: none">
+                        <div class="m-loader mr-4">
+                            <svg class="m-circular" viewBox="25 25 50 50">
+                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4"
+                                        stroke-miterlimit="10"/>
+                            </svg>
+                        </div>
+                        <h3 class="l-text">Loading</h3>
+                    </div>
+                    {#                    表格数据区域#}
+                    <div class="tile-body table-responsive" id="table">
+                        <table class="table table-hover table-bordered" id="sampleTable"
+                               style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+                            <thead>
+                            <tr>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for application in application_manage %}
+                                <tr>
+
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body">请先添加应用</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

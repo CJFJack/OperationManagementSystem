@@ -1,0 +1,160 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    {#    页面头部#}
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-edit"></i> 添加应用</h1>
+            <p> 添加 IIS 站点、Java 应用</p>
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">系统管理</li>
+            <li class="breadcrumb-item"><a href="{% url 'system:application_manage' %}">应用管理</a></li>
+            <li class="breadcrumb-item active"><a href="#">添加应用</a></li>
+        </ul>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <form class="form-horizontal" action="{% url 'system:application_add' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">站点名称</label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="text" name="fullname" placeholder="请输入站点名称">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">站点简称</label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="text" name="short_name" placeholder="请输入站点简称">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">配置文件夹名称</label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="text" name="config_dir_name" placeholder="请输入配置文件夹名称">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">配置文件</label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="text" name="config_files"
+                                       placeholder="请输入配置文件,以分号;隔开">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">所属 ECS</label>
+                            <div class="col-md-8">
+                                <select class="form-control" id="demoSelect1" multiple="multiple" name="select_ecs[]">
+                                    <optgroup label="选择所属 ECS">
+                                        {% for ecs in ecs_list %}
+                                            <option value="{{ ecs.name }}"
+                                                    {% if ecs in site.ECSlists.all %}selected{% endif %}>{{ ecs.name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">所属应用族</label>
+                            <div class="col-md-8">
+                                <select class="form-control" id="demoSelect2" multiple="">
+                                    <optgroup label="选择所属应用族">
+                                        {% for ecs in ecs_list %}
+                                            <option value="{{ ecs.name }}"
+                                                    {% if ecs in site.ECSlists.all %}selected{% endif %}>{{ ecs.name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">端口号</label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="number" name="port" placeholder="请输入端口号">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">测试页面</label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="text" name="test_page" placeholder="请输入测试页面">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">状态</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input name="status" value="Y" class="form-check-input" type="radio">启用
+                                </label>
+                            </div>&nbsp;&nbsp;
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input name="status" value="N" class="form-check-input" type="radio">禁用
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">研发负责人</label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="text" name="dev_charge" placeholder="请输入研发负责人">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">发布注意事项</label>
+                            <div class="col-md-8">
+                            <textarea class="form-control" rows="4" name="deploy_attention"
+                                      placeholder="请输入发布注意事项"></textarea>
+                            </div>
+                        </div>
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit" name="application_add"><i
+                                    class="fa fa-fw fa-lg fa-check-circle"></i>新增
+                            </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-secondary"
+                                                          href="{% url 'system:application_manage' %}"><i
+                                class="fa fa-fw fa-lg fa-times-circle"></i>返回</a>
+                        </div>
+                        <input type="hidden" name="modified_user" value="{{ request.user.username }}">
+                        <input type="hidden" name="random_id" value="{{ random_id }}">
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block custom_static %}
+
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-datepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/select2.min.js' %}"></script>
+    <script type="text/javascript">
+        $('#sl').click(function () {
+            $('#tl').loadingBtn();
+            $('#tb').loadingBtn({text: "Signing In"});
+        });
+
+        $('#el').click(function () {
+            $('#tl').loadingBtnComplete();
+            $('#tb').loadingBtnComplete({html: "Sign In"});
+        });
+
+        $('#demoDate').datepicker({
+            format: "dd/mm/yyyy",
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        $('#demoSelect1').select2();
+        $('#demoSelect2').select2();
+    </script>
+
+{% endblock %}

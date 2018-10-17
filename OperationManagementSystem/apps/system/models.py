@@ -63,16 +63,17 @@ class Application(models.Model):
         (DISABLE, 'disable'),
     )
     fullname = models.CharField(max_length=50, verbose_name=u'应用全称')
-    short_name = models.CharField(max_length=30, verbose_name=u'应用简称')
-    config_dir_name = models.CharField(max_length=50, verbose_name=u'配置文件夹名称')
+    short_name = models.CharField(null=True, blank=True, max_length=30, verbose_name=u'应用简称')
+    config_dir_name = models.CharField(null=True, blank=True, max_length=50, verbose_name=u'配置文件夹名称')
     ECS_lists = models.ManyToManyField(ECS, verbose_name=u'关联ECS列表')
     port = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'应用端口')
-    test_page = models.CharField(max_length=30, null=True, verbose_name=u'测试页面')
-    dev_charge = models.CharField(max_length=10, null=True, blank=True, verbose_name=u'研发负责人')
+    test_page = models.CharField(null=True, blank=True, max_length=30, verbose_name=u'测试页面')
+    dev_charge = models.CharField(null=True, blank=True, max_length=10, verbose_name=u'研发负责人')
     deploy_attention = models.TextField(null=True, blank=True, verbose_name=u'发布注意事项')
     modified_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
     modified_user = models.CharField(max_length=20, default='admin', verbose_name=u'修改人')
     status = models.CharField(
+        null=True, blank=True,
         max_length=1,
         choices=status_CHOICES,
         default=ENABLE,
@@ -80,6 +81,7 @@ class Application(models.Model):
     )
     application_race = models.ForeignKey(ApplicationRace, on_delete=models.CASCADE, null=True, blank=True,
                                          verbose_name=u'关联站点族')
+    random_id = models.IntegerField(verbose_name=u'应用随机ID')
 
     class Meta:
         verbose_name = u'应用信息表'
