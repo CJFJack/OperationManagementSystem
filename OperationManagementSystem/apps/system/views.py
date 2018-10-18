@@ -3,19 +3,21 @@ from __future__ import unicode_literals
 
 
 from django.views import generic
-from OperationManagementSystem.apps.system.models import ECS, Application
+from OperationManagementSystem.apps.system.models import ECS, Application, ApplicationRace
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from acs_api.acs_sync_all_ecs import sync_all_ecs
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from acs_api.acs_update_ecs_info import update_ecs_info
-from django.shortcuts import render
+from django.shortcuts import render, reverse
 from acs_api.acs_update_ecs_monitor import update_ecs_monitor
 from OperationManagementSystem.apps.system.forms import ApplicationForm
 
-import json, random
+import json
+import random
+import time
 
 app_name = 'system'
 
@@ -127,30 +129,65 @@ class ApplicationListView(generic.ListView):
         return Application.objects.order_by('fullname')
 
 
+@login_required(login_url='/login/')
+def application_delete(request, application_id):
+    application = Application.objects.get(pk=application_id)
+    application.delete()
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ApplicationAdd(generic.View):
     def get(self, request):
         ecs_list = ECS.objects.all()
-        random_id = random.randint(10000000, 99999999)
-        return render(request, 'system/application_add.html', {'ecs_list': ecs_list, 'random_id': random_id})
+        application_race_list = ApplicationRace.objects.all()
+        return render(request, 'system/application_add.html', {'ecs_list': ecs_list,
+                                                               'application_race_list': application_race_list})
 
     def post(self, request):
         application_form = ApplicationForm(request.POST)
         if application_form.is_valid():
-            application_form.save(commit=True)
-            application = Application.objects.get(random_id=request.POST['random_id'])
+            """保存站点基本信息"""
+            application_form.save(commit=False)
+            random_id = random.randint(10000000, 99999999)
+            application_form.instance.random_id = random_id
+            application_form.save()
+            """添加关联ECS"""
+            application = Application.objects.get(random_id=random_id)
             application.modified_user = request.user.username
             ecs_list = request.POST.getlist('select_ecs[]', '')
             if ecs_list:
                 for ecs in ecs_list:
                     ecs_obj = ECS.objects.get(name=ecs)
                     application.ECS_lists.add(ecs_obj)
+            """添加关联配置文件"""
+            config_files_list = request.POST['config_files'].split(';')
+            if config_files_list:
+                for config_file in config_files_list:
+                    application.configfile_set.create(filename=config_file)
+            """添加应用族"""
+            application_race_id = request.POST['select_application_race']
+            application.application_race_id = int(application_race_id)
             application.save()
-
-            return render(request, 'system/application_manage.html', {})
+            return HttpResponseRedirect(reverse('system:application_manage'))
         else:
             return render(request, 'system/application_manage.html', {'application_form': application_form})
 
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ApplicationRaceListView(generic.ListView):
+    model = ApplicationRace
+    template_name = 'system/application_race.html'
+    context_object_name = 'application_race_list'
+
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def application_race_add(request):
+    random_id = int(round(time.time() * 1000))
+    application_race = ApplicationRace(race_id=random_id)
+    application_race.save()
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 

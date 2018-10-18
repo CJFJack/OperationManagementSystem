@@ -36,7 +36,9 @@
     </div>
     {#        按钮区域#}
     <div>
-        <button class="btn btn-success" type="button" onclick="window.location.href='{% url "system:application_add" %}'">添加应用</button>
+        <button class="btn btn-success" type="button"
+                onclick="window.location.href='{% url "system:application_add" %}'">添加应用
+        </button>
     </div>
     {% if application_manage %}
         {#        表格区域#}
@@ -59,13 +61,45 @@
                                style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
                             <thead>
                             <tr>
-
+                                <th>站点名称</th>
+                                <th>站点简称</th>
+                                <th>配置文件夹名称</th>
+                                <th>配置文件名称</th>
+                                <th>所属ECS</th>
+                                <th>所属站点族</th>
+                                <th>操作</th>
+                                <th>状态</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for application in application_manage %}
                                 <tr>
-
+                                    <td>
+                                        <a href="#">{{ application.fullname }}</a>
+                                    </td>
+                                    <td>{{ application.short_name }}</td>
+                                    <td>{{ application.config_dir_name }}</td>
+                                    <td>
+                                        {% for config_file in application.configfile_set.all %}
+                                            <span>{{ config_file.filename }}</span><br/>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for ecs in application.ECS_lists.all %}
+                                            <span>{{ ecs }}</span><br/>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {{ application.application_race.alias }}
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-primary" href="#">修改</a>
+                                        <a class="btn btn-danger" id="demoSwal{{ forloop.counter }}" href="#">删除</a>
+                                    </td>
+                                    <td>
+                                        {% if application.status == 'N' %}<span class="text-danger">禁用</span>{% else %}
+                                            启用{% endif %}
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -74,6 +108,7 @@
                 </div>
             </div>
         </div>
+        {#        <a class="btn btn-info" id="demoSwal" href="#">Sample Alert</a>#}
     {% else %}
         <div class="row">
             <div class="col-md-12">
@@ -83,5 +118,58 @@
             </div>
         </div>
     {% endif %}
+
+{% endblock %}
+
+{% block custom_static %}
+
+    <!-- Data table plugin-->
+    <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
+    <script type="text/javascript">$('#sampleTable').DataTable();</script>
+
+    <!--Delete Alarm-->
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-notify.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/sweetalert.min.js' %}"></script>
+    <script type="text/javascript">
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+        $('#demoNotify').click(function () {
+            $.notify({
+                title: "Update Complete : ",
+                message: "Something cool is just updated!",
+                icon: 'fa fa-check'
+            }, {
+                type: "info"
+            });
+        });
+        {% for application in application_manage %}
+            $('#demoSwal{{ forloop.counter }}').click(function () {
+                swal({
+                    title: "Are you sure?",
+                    text: "You will not be able to recover this imaginary file!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel plx!",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        let postUrl = "{% url 'system:application_delete' application.id %}"
+                        $.post(postUrl, function (data) {
+                            if (data.success) {
+                                swal("Deleted!", "Your imaginary file has been deleted.", "success");
+                                location.reload();
+                            }
+                        })
+                    } else {
+                        swal("Cancelled", "Your imaginary file is safe :)", "error");
+                    }
+                });
+            });
+        {% endfor %}
+    </script>
 
 {% endblock %}

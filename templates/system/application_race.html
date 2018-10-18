@@ -1,0 +1,156 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+
+{% block content %}
+
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> 应用族管理</h1>
+            {% if application_race %}
+                <p> 管理属于同一族群的应用，同一族群下应用使用相同配置文件</p>
+            {% else %}
+                <p>No application_race are available.</p>
+            {% endif %}
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">系统管理</li>
+            <li class="breadcrumb-item active"><a href="#">应用族管理</a></li>
+        </ul>
+    </div>
+    {#        操作结果提示栏区域#}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="bs-component">
+                <div class="alert alert-dismissible" id="notice" style="display: none;">
+                    <button class="close" type="button" data-dismiss="alert">×</button>
+                    <h4></h4>
+                    <p><a class="alert-link" href="#"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {#        按钮区域#}
+    <div>
+        <button class="btn btn-success" type="button" onclick="application_race_add()">添加应用族</button>
+    </div>
+
+    {#    表格数据区域#}
+    {% if application_race_list %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    {#                    Loading 遮盖层#}
+                    <div class="overlay" style="display: none">
+                        <div class="m-loader mr-4">
+                            <svg class="m-circular" viewBox="25 25 50 50">
+                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4"
+                                        stroke-miterlimit="10"/>
+                            </svg>
+                        </div>
+                        <h3 class="l-text">Loading</h3>
+                    </div>
+                    {#                    表格数据区域#}
+                    <div class="tile-body table-responsive" id="table">
+                        <table class="table table-hover table-bordered" id="sampleTable"
+                               style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+                            <thead>
+                            <tr>
+                                <th>站点族编号</th>
+                                <th>简称</th>
+                                <th>关联站点</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for application_race in application_race_list %}
+                                <tr>
+                                    <td>{{ application_race.race_id }}</td>
+                                    <td>{{ application_race.alias }}</td>
+                                    <td>
+                                        {% for application in application_race.application_set.all %}
+                                            <p>{{ application.fullname }}</p>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <a href="" type="button"
+                                           class="btn btn-info">编辑</a>
+                                        <a href="javascript:void(0);"
+                                           onclick=""
+                                           type="button"
+                                           class="btn btn-danger">删除</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body">请先添加应用族</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+
+{% block custom_static %}
+
+    <!-- Data table plugin-->
+    <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
+    <script type="text/javascript">$('#sampleTable').DataTable();</script>
+
+    <script>
+
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+
+        // 添加应用族
+        function application_race_add() {
+            let postUrl = "{% url 'system:application_race_add' %}";
+            // 显示 loading 遮盖层
+            $(".overlay").css("display", "");
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    location.reload();
+                    // 提示成功信息
+                    $("#notice").css("display", "");
+                    $("#notice").addClass("alert-success");
+                    $("#notice").children("h4").text("Success!");
+                    $("#notice").children("p").text("添加应用族成功！");
+                    setTimeout(function () {
+                        // 延迟20秒后关闭提示信息
+                        $("#notice").css("display", "none");
+                    }, 20000);
+                }
+                else {
+                    // 提示失败信息
+                    $("#notice").css("display", "");
+                    $("#notice").addClass("alert-warning");
+                    $("#notice").children("h4").text("Failed!");
+                    $("#notice").children("p").text("添加应用族失败！");
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    $(".overlay").css("display", "none");
+                }, 300);
+            });
+        }
+
+    </script>
+
+{% endblock %}

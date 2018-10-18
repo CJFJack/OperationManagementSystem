@@ -44,8 +44,8 @@ class ECS(models.Model):
 
 
 class ApplicationRace(models.Model):
-    race_id = models.BigIntegerField()
-    alias = models.CharField(max_length=50, null=True, blank=True)
+    race_id = models.BigIntegerField(verbose_name=u'随机应用族id')
+    alias = models.CharField(max_length=50, null=True, blank=True, verbose_name=u'应用族别名')
 
     class Meta:
         verbose_name = u'应用族群信息表'
@@ -81,7 +81,7 @@ class Application(models.Model):
     )
     application_race = models.ForeignKey(ApplicationRace, on_delete=models.CASCADE, null=True, blank=True,
                                          verbose_name=u'关联站点族')
-    random_id = models.IntegerField(verbose_name=u'应用随机ID')
+    random_id = models.IntegerField(null=True, blank=True, verbose_name=u'应用随机ID')
 
     class Meta:
         verbose_name = u'应用信息表'

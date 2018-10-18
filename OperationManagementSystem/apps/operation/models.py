@@ -88,8 +88,8 @@ class SLBToSite(models.Model):
 class SLBHealthStatus(models.Model):
     SLB = models.ForeignKey(SLB, on_delete=models.CASCADE, verbose_name=u'所属SLB')
     ECS = models.ForeignKey(ECS, on_delete=models.CASCADE, verbose_name=u'所属ECS')
-    SLBstatus = models.CharField(max_length=10, null=True, blank=True, verbose_name=u'SLB启用状态')
-    healthstatus = models.CharField(max_length=10, null=True, blank=True, verbose_name=u'SLB后端应用健康状态')
+    SLBStatus = models.CharField(max_length=10, null=True, blank=True, verbose_name=u'SLB启用状态')
+    health_status = models.CharField(max_length=10, null=True, blank=True, verbose_name=u'SLB后端应用健康状态')
 
     def __unicode__(self):
-        return self.healthstatus
+        return self.health_status

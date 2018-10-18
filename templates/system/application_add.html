@@ -66,11 +66,10 @@
                         <div class="form-group row">
                             <label class="control-label col-md-2">所属应用族</label>
                             <div class="col-md-8">
-                                <select class="form-control" id="demoSelect2" multiple="">
+                                <select class="form-control" id="demoSelect2" name="select_application_race">
                                     <optgroup label="选择所属应用族">
-                                        {% for ecs in ecs_list %}
-                                            <option value="{{ ecs.name }}"
-                                                    {% if ecs in site.ECSlists.all %}selected{% endif %}>{{ ecs.name }}</option>
+                                        {% for application_race in application_race_list %}
+                                            <option value="{{ application_race.id }}">{{ application_race.alias }}</option>
                                         {% endfor %}
                                     </optgroup>
                                 </select>
@@ -92,7 +91,7 @@
                             <label class="control-label col-md-2">状态</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             <div class="form-check">
                                 <label class="form-check-label">
-                                    <input name="status" value="Y" class="form-check-input" type="radio">启用
+                                    <input name="status" value="Y" class="form-check-input" type="radio" checked>启用
                                 </label>
                             </div>&nbsp;&nbsp;
                             <div class="form-check">
@@ -122,7 +121,7 @@
                                 class="fa fa-fw fa-lg fa-times-circle"></i>返回</a>
                         </div>
                         <input type="hidden" name="modified_user" value="{{ request.user.username }}">
-                        <input type="hidden" name="random_id" value="{{ random_id }}">
+                        <input type="hidden" name="random_id" value="">
                     </form>
                 </div>
 
