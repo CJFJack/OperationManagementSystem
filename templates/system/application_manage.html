@@ -93,7 +93,7 @@
                                         {{ application.application_race.alias }}
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary" href="#">修改</a>
+                                        <a class="btn btn-primary" href="{% url 'system:application_change' application.id %}">修改</a>
                                         <a class="btn btn-danger" id="demoSwal{{ forloop.counter }}" href="#">删除</a>
                                     </td>
                                     <td>

@@ -17,4 +17,7 @@ urlpatterns = [
     url(r'^application_race/$', views.ApplicationRaceListView.as_view(), name='application_race'),
     url(r'^application_race_add/$', views.application_race_add, name='application_race_add'),
     url(r'^application_delete/(?P<application_id>[0-9]+)/$', views.application_delete, name='application_delete'),
+    url(r'^application_change/(?P<pk>[0-9]+)/$', views.ApplicationChangeView.as_view(),
+        name='application_change'),
+    url(r'^application_save/(?P<application_id>[0-9]+)/$', views.application_save, name='application_save'),
 ]

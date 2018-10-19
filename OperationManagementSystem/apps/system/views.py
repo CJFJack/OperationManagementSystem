@@ -147,27 +147,29 @@ class ApplicationAdd(generic.View):
     def post(self, request):
         application_form = ApplicationForm(request.POST)
         if application_form.is_valid():
-            """保存站点基本信息"""
+            """保存应用基本信息"""
             application_form.save(commit=False)
             random_id = random.randint(10000000, 99999999)
             application_form.instance.random_id = random_id
             application_form.save()
-            """添加关联ECS"""
+            """实例化"""
             application = Application.objects.get(random_id=random_id)
-            application.modified_user = request.user.username
-            ecs_list = request.POST.getlist('select_ecs[]', '')
-            if ecs_list:
-                for ecs in ecs_list:
-                    ecs_obj = ECS.objects.get(name=ecs)
-                    application.ECS_lists.add(ecs_obj)
             """添加关联配置文件"""
             config_files_list = request.POST['config_files'].split(';')
             if config_files_list:
                 for config_file in config_files_list:
                     application.configfile_set.create(filename=config_file)
+            """添加关联ECS"""
+            application.modified_user = request.user.username
+            ecs_id_list = request.POST.getlist('select_ecs[]', '')
+            if ecs_id_list:
+                for ecs_id in ecs_id_list:
+                    ecs_obj = ECS.objects.get(name=ecs_id)
+                    application.ECS_lists.add(ecs_obj)
             """添加应用族"""
             application_race_id = request.POST['select_application_race']
             application.application_race_id = int(application_race_id)
+            """保存"""
             application.save()
             return HttpResponseRedirect(reverse('system:application_manage'))
         else:
@@ -190,4 +192,54 @@ def application_race_add(request):
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ApplicationChangeView(generic.DetailView):
+    model = Application
+    template_name = 'system/application_change.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(ApplicationChangeView, self).get_context_data(**kwargs)
+        ecs_list = ECS.objects.all()
+        application_race_list = ApplicationRace.objects.all()
+        context['ecs_list'] = ecs_list
+        context['application_race_list'] = application_race_list
+        return context
+
+
+@login_required(login_url='/login/')
+def application_save(request, application_id):
+    application_form = ApplicationForm(request.POST, instance=Application.objects.get(pk=application_id))
+    application_form.save(commit=True)
+    """实例化"""
+    application = Application.objects.get(pk=application_id)
+    """更新所属配置文件"""
+    config_files_list = request.POST['config_files'].split(';')
+    if config_files_list:
+        for config_file in config_files_list:
+            if config_file in application.get_config_files_name_list():
+                pass
+            else:
+                application.configfile_set.create(filename=config_file)
+    for config_file in application.get_config_files_name_list():
+        if config_file in config_files_list:
+            pass
+        else:
+            a = application.configfile_set.get(filename=config_file)
+            a.delete()
+    """修改所属ECS"""
+    ecs_id_list = request.POST.getlist('select_ecs[]', '')
+    if ecs_id_list:
+        for ecs_id in ecs_id_list:
+            if ecs_id in application.get_ecs_id_list():
+                pass
+            else:
+                ecs_obj = ECS.objects.get(pk=int(ecs_id))
+                application.ECS_lists.add(ecs_obj)
+    # print application.get_ecs_id_list()
+    for ecs_id in application.get_ecs_id_list():
+        if ecs_id in ecs_id_list:
+            pass
+        else:
+            ecs_obj = ECS.objects.get(pk=int(ecs_id))
+            application.ECS_lists.remove(ecs_obj)
+    return HttpResponseRedirect(reverse('system:application_manage'))

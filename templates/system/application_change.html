@@ -3,51 +3,67 @@
 
 {% block content %}
 
-    {#    页面头部#}
     <div class="app-title">
         {#            页面简介区域#}
         <div>
-            <h1><i class="fa fa-edit"></i> 添加应用</h1>
-            <p> 添加 IIS 站点、Java 应用</p>
+            <h1><i class="fa fa-th-list"></i> 修改应用</h1>
+            <p> 修改应用基本信息</p>
         </div>
         {#            面包屑区域#}
         <ul class="app-breadcrumb breadcrumb side">
             <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
             <li class="breadcrumb-item">系统管理</li>
             <li class="breadcrumb-item"><a href="{% url 'system:application_manage' %}">应用管理</a></li>
-            <li class="breadcrumb-item active"><a href="#">添加应用</a></li>
+            <li class="breadcrumb-item active"><a href="#">修改应用</a></li>
         </ul>
     </div>
+    {#        操作结果提示栏区域#}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="bs-component">
+                <div class="alert alert-dismissible" id="notice" style="display: none;">
+                    <button class="close" type="button" data-dismiss="alert">×</button>
+                    <h4></h4>
+                    <p><a class="alert-link" href="#"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    {#    表单区域#}
     <div class="row">
         <div class="col-md-12">
             <div class="tile">
                 <div class="tile-body">
-                    <form class="form-horizontal" action="{% url 'system:application_add' %}" method="post">
+                    <form class="form-horizontal" action="{% url 'system:application_save' application.id %}" method="post">
                         {% csrf_token %}
                         <div class="form-group row">
                             <label class="control-label col-md-2">应用名称</label>
                             <div class="col-md-5">
-                                <input class="form-control" type="text" name="fullname" placeholder="请输入站点名称">
+                                <input class="form-control" type="text" name="fullname"
+                                       value="{{ application.fullname }}">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="control-label col-md-2">应用简称</label>
                             <div class="col-md-5">
-                                <input class="form-control" type="text" name="short_name" placeholder="请输入站点简称">
+                                <input class="form-control" type="text" name="short_name"
+                                       value="{{ application.short_name }}">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="control-label col-md-2">配置文件夹名称</label>
                             <div class="col-md-5">
-                                <input class="form-control" type="text" name="config_dir_name" placeholder="请输入配置文件夹名称">
+                                <input class="form-control" type="text" name="config_dir_name"
+                                       value="{{ application.config_dir_name }}">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="control-label col-md-2">配置文件</label>
                             <div class="col-md-5">
                                 <input class="form-control" type="text" name="config_files"
-                                       placeholder="请输入配置文件,以分号;隔开">
+                                       value="{{ application.get_config_files_name_by_semicolon }}">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -57,7 +73,7 @@
                                     <optgroup label="选择所属 ECS">
                                         {% for ecs in ecs_list %}
                                             <option value="{{ ecs.id }}"
-                                                    {% if ecs in site.ECSlists.all %}selected{% endif %}>{{ ecs.name }}</option>
+                                                    {% if ecs in application.ECS_lists.all %}selected{% endif %}>{{ ecs.name }}</option>
                                         {% endfor %}
                                     </optgroup>
                                 </select>
@@ -68,8 +84,10 @@
                             <div class="col-md-8">
                                 <select class="form-control" id="demoSelect2" name="select_application_race">
                                     <optgroup label="选择所属应用族">
+                                        <option>...</option>
                                         {% for application_race in application_race_list %}
-                                            <option value="{{ application_race.id }}">{{ application_race.alias }}</option>
+                                            <option value="{{ application_race.id }}"
+                                                    {% if application.application_race_id == application_race.id %}selected{% endif %}>{{ application_race.alias }}</option>
                                         {% endfor %}
                                     </optgroup>
                                 </select>
@@ -78,25 +96,28 @@
                         <div class="form-group row">
                             <label class="control-label col-md-2">端口号</label>
                             <div class="col-md-5">
-                                <input class="form-control" type="number" name="port" placeholder="请输入端口号">
+                                <input class="form-control" type="number" name="port" value="{{ application.port }}">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="control-label col-md-2">测试页面</label>
                             <div class="col-md-5">
-                                <input class="form-control" type="text" name="test_page" placeholder="请输入测试页面">
+                                <input class="form-control" type="text" name="test_page"
+                                       value="{{ application.test_page }}">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="control-label col-md-2">状态</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             <div class="form-check">
                                 <label class="form-check-label">
-                                    <input name="status" value="Y" class="form-check-input" type="radio" checked>启用
+                                    <input name="status" value="Y" class="form-check-input" type="radio"
+                                           {% if application.status == "Y" %}checked{% endif %}>启用
                                 </label>
                             </div>&nbsp;&nbsp;
                             <div class="form-check">
                                 <label class="form-check-label">
-                                    <input name="status" value="N" class="form-check-input" type="radio">禁用
+                                    <input name="status" value="N" class="form-check-input" type="radio"
+                                           {% if application.status == "N" %}checked{% endif %}>禁用
                                 </label>
                             </div>
                         </div>
@@ -114,8 +135,8 @@
                             </div>
                         </div>
                         <div class="tile-footer">
-                            <button class="btn btn-primary" type="submit" name="application_add"><i
-                                    class="fa fa-fw fa-lg fa-check-circle"></i>新增
+                            <button class="btn btn-primary" type="submit" name="application_save"><i
+                                    class="fa fa-fw fa-lg fa-check-circle"></i>保存
                             </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-secondary"
                                                           href="{% url 'system:application_manage' %}"><i
                                 class="fa fa-fw fa-lg fa-times-circle"></i>返回</a>
@@ -124,7 +145,6 @@
                         <input type="hidden" name="random_id" value="">
                     </form>
                 </div>
-
             </div>
         </div>
     </div>

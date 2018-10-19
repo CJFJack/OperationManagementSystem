@@ -66,7 +66,7 @@ class Application(models.Model):
     short_name = models.CharField(null=True, blank=True, max_length=30, verbose_name=u'应用简称')
     config_dir_name = models.CharField(null=True, blank=True, max_length=50, verbose_name=u'配置文件夹名称')
     ECS_lists = models.ManyToManyField(ECS, verbose_name=u'关联ECS列表')
-    port = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'应用端口')
+    port = models.IntegerField(null=True, blank=True, verbose_name=u'应用端口')
     test_page = models.CharField(null=True, blank=True, max_length=30, verbose_name=u'测试页面')
     dev_charge = models.CharField(null=True, blank=True, max_length=10, verbose_name=u'研发负责人')
     deploy_attention = models.TextField(null=True, blank=True, verbose_name=u'发布注意事项')
@@ -82,6 +82,24 @@ class Application(models.Model):
     application_race = models.ForeignKey(ApplicationRace, on_delete=models.CASCADE, null=True, blank=True,
                                          verbose_name=u'关联站点族')
     random_id = models.IntegerField(null=True, blank=True, verbose_name=u'应用随机ID')
+
+    def get_config_files_name_by_semicolon(self):
+        if self.configfile_set.all():
+            return ';'.join([config_file.filename for config_file in self.configfile_set.all()])
+        else:
+            return []
+
+    def get_config_files_name_list(self):
+        if self.configfile_set.all():
+            return [config_file.filename for config_file in self.configfile_set.all()]
+        else:
+            return []
+
+    def get_ecs_id_list(self):
+        if self.ECS_lists.all():
+            return [str(ecs.id) for ecs in self.ECS_lists.all()]
+        else:
+            return []
 
     class Meta:
         verbose_name = u'应用信息表'
