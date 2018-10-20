@@ -73,7 +73,7 @@ class DeployECS(models.Model):
         return self.ECS.name
 
 
-class SLBToSite(models.Model):
+class SLBToApplication(models.Model):
     SLB = models.ForeignKey(SLB, on_delete=models.CASCADE, verbose_name=u'所属SLB')
     application = models.ForeignKey(Application, on_delete=models.CASCADE, verbose_name=u'所属应用')
 

@@ -45,8 +45,8 @@
                                         src="https://s3.amazonaws.com/uifaces/faces/twitter/jsa/48.jpg"
                                         alt="User Image">
         <div>
-            <p class="app-sidebar__user-name">John Doe</p>
-            <p class="app-sidebar__user-designation">Frontend Developer</p>
+            <p class="app-sidebar__user-name">{{ user.username }}</p>
+            <p class="app-sidebar__user-designation">{{ user.groups.all.0 }}</p>
         </div>
     </div>
     <ul class="app-menu">
@@ -67,7 +67,7 @@
                     ECS管理</a></li>
                 <li><a class="treeview-item" href="{% url 'system:application_race' %}"><i class="icon fa fa-circle-o"></i> 应用族管理</a></li>
                 <li><a class="treeview-item" href="{% url 'system:application_manage' %}"><i class="icon fa fa-circle-o"></i> 应用管理</a></li>
-                <li><a class="treeview-item" href=""><i class="icon fa fa-circle-o"></i> SLB管理</a></li>
+                <li><a class="treeview-item" href="{% url 'system:slb_manage' %}"><i class="icon fa fa-circle-o"></i> SLB管理</a></li>
             </ul>
         </li>
         <li><a class="app-menu__item" href=""><i class="app-menu__icon fa fa-edit"></i><span
@@ -82,7 +82,7 @@
         </li>
         <li><a class="app-menu__item" href=""><i class="app-menu__icon fa fa-exclamation-triangle"></i><span
                 class="app-menu__label">报警管理</span></a></li>
-        <li><a class="app-menu__item" href=""><i class="app-menu__icon fa fa-inbox"></i><span
+        <li><a class="app-menu__item" href="/admin/"><i class="app-menu__icon fa fa-inbox"></i><span
                 class="app-menu__label">后台管理</span></a></li>
     </ul>
 </aside>

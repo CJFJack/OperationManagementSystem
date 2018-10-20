@@ -1,0 +1,106 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> 修改应用族</h1>
+            <p> 修改应用族简称，关联应用</p>
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">系统管理</li>
+            <li class="breadcrumb-item"><a href="{% url 'system:application_race' %}">应用族管理</a></li>
+            <li class="breadcrumb-item active"><a href="#">修改应用族</a></li>
+        </ul>
+    </div>
+    {#        操作结果提示栏区域#}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="bs-component">
+                <div class="alert alert-dismissible" id="notice" style="display: none;">
+                    <button class="close" type="button" data-dismiss="alert">×</button>
+                    <h4></h4>
+                    <p><a class="alert-link" href="#"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#    表单区域#}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <form class="form-horizontal" action="{% url 'system:application_race_save' application_race.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">应用族ID</label>
+                            <div class="col-md-5">
+                                {{ application_race.race_id }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">应用族简称</label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="text" name="alias"
+                                       value="{{ application_race.alias }}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">关联应用</label>
+                            <div class="col-md-8">
+                                <select class="form-control" id="demoSelect1" multiple="multiple" name="select_application_id[]">
+                                    <optgroup label="选择关联应用">
+                                        {% for application in application_list %}
+                                            <option value="{{ application.id }}"
+                                                    {% if application in application_race.application_set.all %}selected{% endif %}>{{ application.fullname }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit" name="application_race_save"><i
+                                    class="fa fa-fw fa-lg fa-check-circle"></i>保存
+                            </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-secondary"
+                                                          href="{% url 'system:application_race' %}"><i
+                                class="fa fa-fw fa-lg fa-times-circle"></i>返回</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block custom_static %}
+
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-datepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/select2.min.js' %}"></script>
+    <script type="text/javascript">
+        $('#sl').click(function () {
+            $('#tl').loadingBtn();
+            $('#tb').loadingBtn({text: "Signing In"});
+        });
+
+        $('#el').click(function () {
+            $('#tl').loadingBtnComplete();
+            $('#tb').loadingBtnComplete({html: "Sign In"});
+        });
+
+        $('#demoDate').datepicker({
+            format: "dd/mm/yyyy",
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        $('#demoSelect1').select2();
+    </script>
+
+{% endblock %}

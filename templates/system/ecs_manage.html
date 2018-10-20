@@ -35,7 +35,7 @@
     </div>
     {#        按钮区域#}
     <div>
-        <button class="btn btn-success" type="button" onclick="SyncAllECS()">同步所有ECS</button>
+        <button class="btn btn-success" type="button" onclick="sync_all_ecs()">同步所有ECS</button>
         <button class="btn btn-info" type="button" onclick="update_all_ecs_info()">刷新所有ECS基础信息</button>
         <button class="btn btn-warning" type="button" onclick="update_all_ecs_resource()">刷新所有ECS监控数据</button>
     </div>
@@ -123,10 +123,12 @@
 {% endblock %}
 
 {% block custom_static %}
+
     <!-- Data table plugin-->
     <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
     <script type="text/javascript">$('#sampleTable').DataTable();</script>
+
     <script>
 
         // 表格刷新
@@ -137,8 +139,8 @@
             });
         }
 
-        //同步所有ECS
-        function SyncAllECS() {
+        // 同步所有ECS
+        function sync_all_ecs() {
             let postUrl = "{% url 'system:sync_all_ecs_from_acs' %}";
             // 显示 loading 遮盖层
             $(".overlay").css("display", "");
@@ -239,4 +241,5 @@
         }
 
     </script>
+
 {% endblock %}

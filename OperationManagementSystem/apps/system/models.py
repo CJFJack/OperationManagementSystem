@@ -47,6 +47,9 @@ class ApplicationRace(models.Model):
     race_id = models.BigIntegerField(verbose_name=u'随机应用族id')
     alias = models.CharField(max_length=50, null=True, blank=True, verbose_name=u'应用族别名')
 
+    def get_application_id_list(self):
+        return [str(a.id) for a in self.application_set.all()]
+
     class Meta:
         verbose_name = u'应用族群信息表'
         verbose_name_plural = verbose_name

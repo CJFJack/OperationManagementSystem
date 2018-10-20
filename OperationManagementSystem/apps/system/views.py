@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 
 from django.views import generic
-from OperationManagementSystem.apps.system.models import ECS, Application, ApplicationRace
+from OperationManagementSystem.apps.system.models import ECS, Application, ApplicationRace, SLB
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from acs_api.acs_sync_all_ecs import sync_all_ecs
@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from acs_api.acs_update_ecs_info import update_ecs_info
+from acs_api.acs_sync_all_slb import sync_all_slb
 from django.shortcuts import render, reverse
 from acs_api.acs_update_ecs_monitor import update_ecs_monitor
 from OperationManagementSystem.apps.system.forms import ApplicationForm
@@ -190,7 +191,7 @@ def application_race_add(request):
     random_id = int(round(time.time() * 1000))
     application_race = ApplicationRace(race_id=random_id)
     application_race.save()
-    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+    return HttpResponseRedirect(reverse('system:application_race'))
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -250,3 +251,97 @@ def application_save(request, application_id):
         application.application_race_id = int(application_race_id)
     application.save()
     return HttpResponseRedirect(reverse('system:application_manage'))
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ApplicationRaceEditView(generic.DetailView):
+    model = ApplicationRace
+    template_name = 'system/application_race_edit.html'
+    context_object_name = 'application_race'
+    
+    def get_context_data(self, **kwargs):
+        context = super(ApplicationRaceEditView, self).get_context_data(**kwargs)
+        application_list = Application.objects.all()
+        context['application_list'] = application_list
+        return context
+
+
+@login_required(login_url='/login/')
+def application_race_save(request, application_race_id):
+    """实例化"""
+    application_race = ApplicationRace.objects.get(pk=application_race_id)
+    """保存应用族基本信息"""
+    alias = request.POST['alias']
+    application_race.alias = alias
+    application_race.save()
+    """更新应用族关联应用"""
+    select_application_id = request.POST.getlist('select_application_id[]', '')
+    if select_application_id:
+        for application_id in select_application_id:
+            if application_id in application_race.get_application_id_list():
+                pass
+            else:
+                application_obj = Application.objects.get(pk=application_id)
+                application_obj.application_race_id = application_race.id
+                application_obj.save()
+    for application_id in application_race.get_application_id_list():
+        if application_id in select_application_id:
+            pass
+        else:
+            application_obj = Application.objects.get(pk=application_id)
+            application_obj.application_race_id = None
+            application_obj.save()
+    return HttpResponseRedirect(reverse('system:application_race'))
+
+
+@login_required(login_url='/login/')
+def application_race_delete(request, application_race_id):
+    application_race = ApplicationRace.objects.get(pk=application_race_id)
+    application_race.delete()
+    return HttpResponseRedirect(reverse('system:application_race'))
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class SLBListView(generic.ListView):
+    model = SLB
+    template_name = 'system/slb_manage.html'
+    context_object_name = 'slb_list'
+
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def update_all_slb_info(request):
+    slb_list = []
+    try:
+        result = sync_all_slb(region_id='cn-hangzhou')
+    except:
+        return HttpResponse(json.dumps({'success': False, 'message': '网络超时，调用阿里云接口失败'}),
+                            content_type="application/json")
+    else:
+        if 'Message' in result:
+            return HttpResponse(json.dumps({'success': False, 'message': result['Message']}),
+                                content_type="application/json")
+        else:
+            for slb in result:
+                '''新增或更新现有SLB'''
+                if not SLB.objects.filter(instance_id=slb['LoadBalancerId']):
+                    s = SLB(instance_id=slb['LoadBalancerId'], name=slb['LoadBalancerName'],
+                            status=slb['LoadBalancerStatus'], ip=slb['Address'], address_type=slb['AddressType'],
+                            create_date=slb['CreateTime'], network_type=slb['NetworkType'])
+                    s.save()
+                else:
+                    s = SLB.objects.get(instanceid=slb['LoadBalancerId'])
+                    s.instance_id = slb['LoadBalancerId']
+                    s.name = slb['LoadBalancerName']
+                    s.status = slb['LoadBalancerStatus']
+                    s.ip = slb['Address']
+                    s.address_type = slb['AddressType']
+                    s.create_date = slb['CreateTime']
+                    s.network_type = slb['NetworkType']
+                    s.save()
+                slb_list.append(slb['LoadBalancerId'])
+            for current_slb in SLB.objects.all():
+                '''删除阿里云没有的SLB'''
+                if current_slb.instance_id not in slb_list:
+                    current_slb.delete()
+            return HttpResponse(json.dumps({'success': True}), content_type="application/json")

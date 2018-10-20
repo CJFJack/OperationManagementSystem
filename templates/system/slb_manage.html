@@ -1,0 +1,243 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> SLB 管理</h1>
+            {% if slb_list %}
+                <p> 同步阿里云 SLB 信息</p>
+            {% else %}
+                <p>No slb are available.</p>
+            {% endif %}
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">系统管理</li>
+            <li class="breadcrumb-item active"><a href="#">SLB 管理</a></li>
+        </ul>
+    </div>
+    {#        操作结果提示栏区域#}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="bs-component">
+                <div class="alert alert-dismissible" id="notice" style="display: none;">
+                    <button class="close" type="button" data-dismiss="alert">×</button>
+                    <h4></h4>
+                    <p><a class="alert-link" href="#"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {#        按钮区域#}
+    <div>
+        <button class="btn btn-success" type="button" onclick="sync_all_slb()">同步SLB基本信息</button>
+        <a class="btn btn-info" type="button" href="">刷新所有SLB健康信息</a>
+    </div>
+
+    {#        表格区域#}
+    {% if slb_list %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    {#                    Loading 遮盖层#}
+                    <div class="overlay" style="display: none">
+                        <div class="m-loader mr-4">
+                            <svg class="m-circular" viewBox="25 25 50 50">
+                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4"
+                                        stroke-miterlimit="10"/>
+                            </svg>
+                        </div>
+                        <h3 class="l-text">Loading</h3>
+                    </div>
+                    {#                    表格数据区域#}
+                    <div class="tile-body table-responsive" id="table">
+                        <table class="table table-hover table-bordered" id="sampleTable"
+                               style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+                            <thead>
+                            <tr>
+                                <th class="text-right">ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作&nbsp;&nbsp;&nbsp;</th>
+                                <th>健康状态</th>
+                                <th>实例ID</th>
+                                <th>实例别名</th>
+                                <th>实例状态</th>
+                                <th>实例IP</th>
+                                <th>IP地址类型</th>
+                                <th>网络类型</th>
+                                <th>创建时间</th>
+                                <th>站点列表</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for slb in slb_list %}
+                                <tr>
+                                    <td class="text-right" id="td_{{ slb.id }}">
+                                        {% for ecs in slb.slbhealthstatus_set.all %}
+                                            <p>
+                                                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                {% if ecs.SLBstatus == "added" %}
+                                                    <span class="text-info">已添加</span>{% else %}<span
+                                                        class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                                                {% if ecs.SLBstatus == "added" %}
+                                                    {% if ecs.healthstatus == "normal" %}
+                                                        <span class="text-success">正常</span>&nbsp;
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    {% elif ecs.healthstatus == "abnormal" %}
+                                                        <span class="text-danger">异常</span>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    {% else %}<span class="text-warning">正在检查</span>&nbsp;
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                                {% endif %}
+                                                <span>
+                                    {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);"
+                                                                        id="removebackendserver{{ slb.id }}"
+                                                                        onclick="RemoveBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')"
+                                                                        type="button"
+                                                                        class="btn btn-sm btn-warning">移除</a>{% endif %}
+                                                    {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);"
+                                                                                          id="addbackendserver{{ slb.id }}"
+                                                                                          onclick="AddBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')"
+                                                                                          type="button"
+                                                                                          class="btn btn-sm btn-success">添加</a>{% endif %}
+                                </span>
+                                            </p>
+                                        {% endfor %}
+                                    </td>
+                                    <td><a href="javascript:void(0);" id="healthrefresh{{ slb.id }}"
+                                           onclick="HealthRefresh('{{ slb.id }}', '{{ slb.instanceid }}')" type="button"
+                                           class="btn btn-sm btn-info">刷新</a></td>
+                                    <td>
+                                        <button type="button" class="btn btn-link">
+                                            <a href="' slb.id %}">{{ slb.instance_id }}</a>
+                                        </button>
+                                    </td>
+                                    <td>{{ slb.name }}</td>
+                                    <td>{{ slb.status }}</td>
+                                    <td>{{ slb.ip }}</td>
+                                    <td>{% if slb.address_type == "internet" %}公网{% endif %}
+                                        {% if slb.address_type == "intranet" %}
+                                            私网{% endif %}
+                                    </td>
+                                    <td>{% if slb.network_type == "classic" %}经典网络{% endif %}
+                                        {% if slb.network_type == "vpc" %}
+                                            专有网络{% endif %}
+                                    </td>
+                                    <td>{{ slb.create_date }}</td>
+                                    <td>
+                                        {% for application in slb.slbtoapplication_set.all %}
+                                            <p>{{ application }}</p>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body">请先同步阿里云 SLB</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block custom_static %}
+
+    <!-- Data table plugin-->
+    <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
+    <script type="text/javascript">$('#sampleTable').DataTable();</script>
+
+    <script>
+        // 表格刷新
+        function table_data_fresh() {
+            let postUrl = "{% url 'system:ecs_table_refresh' %}";
+            $.post(postUrl, function (data) {
+                $('#table').html(data)
+            });
+        }
+
+        //同步所有SLB
+        function sync_all_slb() {
+            let postUrl = "{% url 'system:sync_all_slb_from_acs' %}";
+            // 显示 loading 遮盖层
+            $(".overlay").css("display", "");
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    location.reload();
+                    // 刷新表格数据
+                    table_data_fresh();
+                    // 提示成功信息
+                    $("#notice").css("display", "");
+                    $("#notice").addClass("alert-success");
+                    $("#notice").children("h4").text("Success!");
+                    $("#notice").children("p").text("从阿里云同步所有 SLB 成功！");
+                    setTimeout(function () {
+                        // 延迟20秒后关闭提示信息
+                        $("#notice").css("display", "none");
+                    }, 20000);
+                }
+                else {
+                    // 提示失败信息
+                    $("#notice").css("display", "");
+                    $("#notice").addClass("alert-warning");
+                    $("#notice").children("h4").text("Failed!");
+                    $("#notice").children("p").text("从阿里云同步所有 SLB 失败！");
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    $(".overlay").css("display", "none");
+                }, 300);
+            });
+        }
+
+        // 更新所有ECS基础信息
+        function update_all_ecs_info() {
+            let postUrl = "{% url 'system:update_all_ecs_info' %}";
+            // 显示 loading 遮盖层
+            $(".overlay").css("display", "");
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 刷新表格数据
+                    table_data_fresh();
+                    // 提示成功信息
+                    $("#notice").css("display", "");
+                    $("#notice").addClass("alert-success");
+                    $("#notice").children("h4").text("Success!");
+                    $("#notice").children("p").text("从阿里云更新所有 ECS 基础信息成功！");
+                    setTimeout(function () {
+                        // 延迟20秒后关闭提示信息
+                        $("#notice").css("display", "none");
+                    }, 20000);
+                } else {
+                    // 提示失败信息
+                    $("#notice").css("display", "");
+                    $("#notice").addClass("alert-warning")
+                    $("#notice").children("h4").text("Failed!");
+                    $("#notice").children("p").text("从阿里云更新所有 ECS 基础信息失败！");
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    $(".overlay").css("display", "none");
+                }, 300);
+            });
+        }
+
+    </script>
+
+{% endblock %}

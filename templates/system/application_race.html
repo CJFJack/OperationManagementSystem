@@ -8,7 +8,7 @@
         {#            页面简介区域#}
         <div>
             <h1><i class="fa fa-th-list"></i> 应用族管理</h1>
-            {% if application_race %}
+            {% if application_race_list %}
                 <p> 管理属于同一族群的应用，同一族群下应用使用相同配置文件</p>
             {% else %}
                 <p>No application_race are available.</p>
@@ -36,7 +36,7 @@
     </div>
     {#        按钮区域#}
     <div>
-        <button class="btn btn-success" type="button" onclick="application_race_add()">添加应用族</button>
+        <a class="btn btn-success" type="button" href="{% url 'system:application_race_add' %}">添加应用族</a>
     </div>
 
     {#    表格数据区域#}
@@ -77,12 +77,8 @@
                                         {% endfor %}
                                     </td>
                                     <td>
-                                        <a href="" type="button"
-                                           class="btn btn-info">编辑</a>
-                                        <a href="javascript:void(0);"
-                                           onclick=""
-                                           type="button"
-                                           class="btn btn-danger">删除</a>
+                                        <a href="{% url 'system:application_race_edit' application_race.id %}" type="button" class="btn btn-info">编辑</a>
+                                        <a href="{% url 'system:application_race_delete' application_race.id %}" type="button" class="btn btn-danger">删除</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -111,46 +107,5 @@
     <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
     <script type="text/javascript">$('#sampleTable').DataTable();</script>
-
-    <script>
-
-        $.ajaxSetup({
-            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
-        });
-
-        // 添加应用族
-        function application_race_add() {
-            let postUrl = "{% url 'system:application_race_add' %}";
-            // 显示 loading 遮盖层
-            $(".overlay").css("display", "");
-            // 发送 post 请求
-            $.post(postUrl, function (data) {
-                if (data.success) {
-                    location.reload();
-                    // 提示成功信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-success");
-                    $("#notice").children("h4").text("Success!");
-                    $("#notice").children("p").text("添加应用族成功！");
-                    setTimeout(function () {
-                        // 延迟20秒后关闭提示信息
-                        $("#notice").css("display", "none");
-                    }, 20000);
-                }
-                else {
-                    // 提示失败信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-warning");
-                    $("#notice").children("h4").text("Failed!");
-                    $("#notice").children("p").text("添加应用族失败！");
-                }
-                setTimeout(function () {
-                    // 延迟300毫秒关闭loading遮盖层
-                    $(".overlay").css("display", "none");
-                }, 300);
-            });
-        }
-
-    </script>
 
 {% endblock %}
