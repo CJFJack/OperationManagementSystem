@@ -159,12 +159,13 @@ class ApplicationAdd(generic.View):
             if config_files_list:
                 for config_file in config_files_list:
                     application.configfile_set.create(filename=config_file)
-            """添加关联ECS"""
+            """添加修改人信息"""
             application.modified_user = request.user.username
+            """添加关联ECS"""
             ecs_id_list = request.POST.getlist('select_ecs[]', '')
             if ecs_id_list:
                 for ecs_id in ecs_id_list:
-                    ecs_obj = ECS.objects.get(name=ecs_id)
+                    ecs_obj = ECS.objects.get(pk=ecs_id)
                     application.ECS_lists.add(ecs_obj)
             """添加应用族"""
             application_race_id = request.POST['select_application_race']
@@ -210,7 +211,7 @@ class ApplicationChangeView(generic.DetailView):
 def application_save(request, application_id):
     application_form = ApplicationForm(request.POST, instance=Application.objects.get(pk=application_id))
     application_form.save(commit=True)
-    """实例化"""
+    """应用实例化"""
     application = Application.objects.get(pk=application_id)
     """更新所属配置文件"""
     config_files_list = request.POST['config_files'].split(';')
@@ -235,11 +236,17 @@ def application_save(request, application_id):
             else:
                 ecs_obj = ECS.objects.get(pk=int(ecs_id))
                 application.ECS_lists.add(ecs_obj)
-    # print application.get_ecs_id_list()
     for ecs_id in application.get_ecs_id_list():
         if ecs_id in ecs_id_list:
             pass
         else:
             ecs_obj = ECS.objects.get(pk=int(ecs_id))
             application.ECS_lists.remove(ecs_obj)
+    """修改所属应用族"""
+    application_race_id = request.POST['select_application_race']
+    if application_race_id == '0':
+        application.application_race_id = None
+    else:
+        application.application_race_id = int(application_race_id)
+    application.save()
     return HttpResponseRedirect(reverse('system:application_manage'))

@@ -84,7 +84,7 @@
                             <div class="col-md-8">
                                 <select class="form-control" id="demoSelect2" name="select_application_race">
                                     <optgroup label="选择所属应用族">
-                                        <option>...</option>
+                                        <option value="0">...</option>
                                         {% for application_race in application_race_list %}
                                             <option value="{{ application_race.id }}"
                                                     {% if application.application_race_id == application_race.id %}selected{% endif %}>{{ application_race.alias }}</option>
@@ -124,14 +124,14 @@
                         <div class="form-group row">
                             <label class="control-label col-md-2">研发负责人</label>
                             <div class="col-md-5">
-                                <input class="form-control" type="text" name="dev_charge" placeholder="请输入研发负责人">
+                                <input class="form-control" type="text" name="dev_charge" value="{{ application.dev_charge }}">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="control-label col-md-2">发布注意事项</label>
                             <div class="col-md-8">
                             <textarea class="form-control" rows="4" name="deploy_attention"
-                                      placeholder="请输入发布注意事项"></textarea>
+                                      value="{{ application.deploy_attention }}"></textarea>
                             </div>
                         </div>
                         <div class="tile-footer">

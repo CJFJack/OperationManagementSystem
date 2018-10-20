@@ -52,7 +52,7 @@ class ApplicationRace(models.Model):
         verbose_name_plural = verbose_name
 
     def __unicode__(self):
-        return str(self.alias)
+        return self.alias
 
 
 class Application(models.Model):
@@ -79,7 +79,7 @@ class Application(models.Model):
         default=ENABLE,
         verbose_name=u'状态'
     )
-    application_race = models.ForeignKey(ApplicationRace, on_delete=models.CASCADE, null=True, blank=True,
+    application_race = models.ForeignKey(ApplicationRace, on_delete=models.SET_NULL, null=True, blank=True,
                                          verbose_name=u'关联站点族')
     random_id = models.IntegerField(null=True, blank=True, verbose_name=u'应用随机ID')
 
