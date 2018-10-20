@@ -45,16 +45,6 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="tile">
-                    {#                    Loading 遮盖层#}
-                    <div class="overlay" style="display: none">
-                        <div class="m-loader mr-4">
-                            <svg class="m-circular" viewBox="25 25 50 50">
-                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4"
-                                        stroke-miterlimit="10"/>
-                            </svg>
-                        </div>
-                        <h3 class="l-text">Loading</h3>
-                    </div>
                     {#                    表格数据区域#}
                     <div class="tile-body table-responsive" id="table">
                         <table class="table table-hover table-bordered" id="sampleTable"
@@ -93,7 +83,8 @@
                                         {{ application.application_race.alias }}
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary" href="{% url 'system:application_change' application.id %}">修改</a>
+                                        <a class="btn btn-primary"
+                                           href="{% url 'system:application_change' application.id %}">修改</a>
                                         <a class="btn btn-danger" id="demoSwal{{ forloop.counter }}" href="#">删除</a>
                                     </td>
                                     <td>
@@ -129,20 +120,10 @@
     <script type="text/javascript">$('#sampleTable').DataTable();</script>
 
     <!--Delete Alarm-->
-    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-notify.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/plugins/sweetalert.min.js' %}"></script>
     <script type="text/javascript">
         $.ajaxSetup({
             data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
-        });
-        $('#demoNotify').click(function () {
-            $.notify({
-                title: "Update Complete : ",
-                message: "Something cool is just updated!",
-                icon: 'fa fa-check'
-            }, {
-                type: "info"
-            });
         });
         {% for application in application_manage %}
             $('#demoSwal{{ forloop.counter }}').click(function () {
@@ -157,7 +138,7 @@
                     closeOnCancel: false
                 }, function (isConfirm) {
                     if (isConfirm) {
-                        let postUrl = "{% url 'system:application_delete' application.id %}"
+                        let postUrl = "{% url 'system:application_delete' application.id %}";
                         $.post(postUrl, function (data) {
                             if (data.success) {
                                 swal("Deleted!", "Your imaginary file has been deleted.", "success");

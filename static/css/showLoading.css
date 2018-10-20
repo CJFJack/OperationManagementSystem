@@ -1,0 +1,47 @@
+	/*a {*/
+	  /*color: blue;*/
+	  /*cursor:pointer;*/
+          /*text-decoration: underline;*/
+	/*}*/
+
+        div.instructions_container {
+	   float: left;
+           width: 350px;
+           margin-right: 50px;
+
+        }
+
+	div#activity_pane {
+           float:left;
+           width: 350px;
+           height: 200px;
+           border: 1px solid #CCCCCC;
+           background-color: #EEEEEE;
+ 	   padding-top: 200px;
+	   text-align: center;
+
+        }
+
+        div.example_links
+         .link_category {
+           margin-bottom: 15px;
+        }
+
+.loading-indicator-bars {
+		background-image: url('https://raw.githubusercontent.com/riverbed/flyscript-portal/master/thirdparty/showLoading/images/loading-bars.gif');
+		width: 150px;
+	}
+
+.loading-indicator {
+	height: 80px;
+	width: 80px;
+	background: url( 'https://raw.githubusercontent.com/riverbed/flyscript-portal/master/thirdparty/showLoading/images/loading.gif' );
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+.loading-indicator-overlay {
+	background-color: #FFFFFF;
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+}

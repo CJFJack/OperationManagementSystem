@@ -17,8 +17,10 @@ urlpatterns = [
     url(r'^application_race_add/$', views.application_race_add, name='application_race_add'),
     url(r'^application_race_edit/(?P<pk>[0-9]+)/$', views.ApplicationRaceEditView.as_view(),
         name='application_race_edit'),
-    url(r'^application_race_save/(?P<application_race_id>[0-9]+)/$', views.application_race_save, name='application_race_save'),
-    url(r'^application_race_delete/(?P<application_race_id>[0-9]+)/$', views.application_race_delete, name='application_race_delete'),
+    url(r'^application_race_save/(?P<application_race_id>[0-9]+)/$', views.application_race_save,
+        name='application_race_save'),
+    url(r'^application_race_delete/(?P<application_race_id>[0-9]+)/$', views.application_race_delete,
+        name='application_race_delete'),
     # Application
     url(r'^application/$', views.ApplicationListView.as_view(), name='application_manage'),
     url(r'^application_add/$', views.ApplicationAdd.as_view(), name='application_add'),
@@ -29,4 +31,5 @@ urlpatterns = [
     # slb
     url(r'^slb_manage/$', views.SLBListView.as_view(), name='slb_manage'),
     url(r'^sync_all_slb_from_acs/$', views.update_all_slb_info, name='sync_all_slb_from_acs'),
+    url(r'^all_slb_health_update/$', views.all_slb_health_update, name='all_slb_health_update'),
 ]

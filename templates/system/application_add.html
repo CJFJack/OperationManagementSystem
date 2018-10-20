@@ -56,8 +56,7 @@
                                 <select class="form-control" id="demoSelect1" multiple="multiple" name="select_ecs[]">
                                     <optgroup label="选择所属 ECS">
                                         {% for ecs in ecs_list %}
-                                            <option value="{{ ecs.id }}"
-                                                    {% if ecs in site.ECSlists.all %}selected{% endif %}>{{ ecs.name }}</option>
+                                            <option value="{{ ecs.id }}">{{ ecs.name }}</option>
                                         {% endfor %}
                                     </optgroup>
                                 </select>
@@ -68,6 +67,7 @@
                             <div class="col-md-8">
                                 <select class="form-control" id="demoSelect2" name="select_application_race">
                                     <optgroup label="选择所属应用族">
+                                        <option value="0">...</option>
                                         {% for application_race in application_race_list %}
                                             <option value="{{ application_race.id }}">{{ application_race.alias }}</option>
                                         {% endfor %}

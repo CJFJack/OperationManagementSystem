@@ -36,24 +36,14 @@
     {#        按钮区域#}
     <div>
         <button class="btn btn-success" type="button" onclick="sync_all_slb()">同步SLB基本信息</button>
-        <a class="btn btn-info" type="button" href="">刷新所有SLB健康信息</a>
+        <button class="btn btn-info" type="button" onclick="update_all_ecs_health_info()">刷新所有SLB健康信息</button>
     </div>
 
     {#        表格区域#}
     {% if slb_list %}
-        <div class="row">
+        <div class="row" id="loading">
             <div class="col-md-12">
                 <div class="tile">
-                    {#                    Loading 遮盖层#}
-                    <div class="overlay" style="display: none">
-                        <div class="m-loader mr-4">
-                            <svg class="m-circular" viewBox="25 25 50 50">
-                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4"
-                                        stroke-miterlimit="10"/>
-                            </svg>
-                        </div>
-                        <h3 class="l-text">Loading</h3>
-                    </div>
                     {#                    表格数据区域#}
                     <div class="tile-body table-responsive" id="table">
                         <table class="table table-hover table-bordered" id="sampleTable"
@@ -69,7 +59,7 @@
                                 <th>IP地址类型</th>
                                 <th>网络类型</th>
                                 <th>创建时间</th>
-                                <th>站点列表</th>
+                                <th>关联应用</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -79,14 +69,14 @@
                                         {% for ecs in slb.slbhealthstatus_set.all %}
                                             <p>
                                                 <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                                {% if ecs.SLBstatus == "added" %}
+                                                {% if ecs.SLBStatus == "added" %}
                                                     <span class="text-info">已添加</span>{% else %}<span
                                                         class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
-                                                {% if ecs.SLBstatus == "added" %}
-                                                    {% if ecs.healthstatus == "normal" %}
+                                                {% if ecs.SLBStatus == "added" %}
+                                                    {% if ecs.health_status == "normal" %}
                                                         <span class="text-success">正常</span>&nbsp;
                                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                    {% elif ecs.healthstatus == "abnormal" %}
+                                                    {% elif ecs.health_status == "abnormal" %}
                                                         <span class="text-danger">异常</span>
                                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                     {% else %}<span class="text-warning">正在检查</span>&nbsp;
@@ -95,12 +85,12 @@
                                                     <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                                 {% endif %}
                                                 <span>
-                                    {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);"
+                                    {% if ecs.SLBStatus == "added" %}<a href="javascript:void(0);"
                                                                         id="removebackendserver{{ slb.id }}"
                                                                         onclick="RemoveBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')"
                                                                         type="button"
                                                                         class="btn btn-sm btn-warning">移除</a>{% endif %}
-                                                    {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);"
+                                                    {% if ecs.SLBStatus == "removed" %}<a href="javascript:void(0);"
                                                                                           id="addbackendserver{{ slb.id }}"
                                                                                           onclick="AddBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')"
                                                                                           type="button"
@@ -161,79 +151,78 @@
     <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
     <script type="text/javascript">$('#sampleTable').DataTable();</script>
 
+    <!-- Notice-->
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-notify.min.js' %}"></script>
+
     <script>
-        // 表格刷新
-        function table_data_fresh() {
-            let postUrl = "{% url 'system:ecs_table_refresh' %}";
-            $.post(postUrl, function (data) {
-                $('#table').html(data)
-            });
-        }
 
         //同步所有SLB
         function sync_all_slb() {
             let postUrl = "{% url 'system:sync_all_slb_from_acs' %}";
             // 显示 loading 遮盖层
-            $(".overlay").css("display", "");
+            jQuery("#loading").showLoading();
             // 发送 post 请求
             $.post(postUrl, function (data) {
                 if (data.success) {
+                    // 刷新页面
                     location.reload();
-                    // 刷新表格数据
-                    table_data_fresh();
                     // 提示成功信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-success");
-                    $("#notice").children("h4").text("Success!");
-                    $("#notice").children("p").text("从阿里云同步所有 SLB 成功！");
-                    setTimeout(function () {
-                        // 延迟20秒后关闭提示信息
-                        $("#notice").css("display", "none");
-                    }, 20000);
+                    $.notify({
+                        title: "同步成功 : ",
+                        message: "从阿里云同步所有 SLB 成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "success"
+                    });
                 }
                 else {
                     // 提示失败信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-warning");
-                    $("#notice").children("h4").text("Failed!");
-                    $("#notice").children("p").text("从阿里云同步所有 SLB 失败！");
+                    $.notify({
+                        title: "同步失败 : ",
+                        message: "从阿里云同步所有 SLB 失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
                 }
                 setTimeout(function () {
                     // 延迟300毫秒关闭loading遮盖层
-                    $(".overlay").css("display", "none");
+                    jQuery("#loading").hideLoading();
                 }, 300);
             });
         }
 
-        // 更新所有ECS基础信息
-        function update_all_ecs_info() {
-            let postUrl = "{% url 'system:update_all_ecs_info' %}";
+        // 刷新所有SLB健康信息
+        function update_all_ecs_health_info() {
+            let postUrl = "{% url 'system:all_slb_health_update' %}";
             // 显示 loading 遮盖层
-            $(".overlay").css("display", "");
+            jQuery("#loading").showLoading();
             // 发送 post 请求
             $.post(postUrl, function (data) {
                 if (data.success) {
-                    // 刷新表格数据
-                    table_data_fresh();
+                    // 刷新页面
+                    location.reload();
                     // 提示成功信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-success");
-                    $("#notice").children("h4").text("Success!");
-                    $("#notice").children("p").text("从阿里云更新所有 ECS 基础信息成功！");
-                    setTimeout(function () {
-                        // 延迟20秒后关闭提示信息
-                        $("#notice").css("display", "none");
-                    }, 20000);
+                    $.notify({
+                        title: "同步成功 : ",
+                        message: "从阿里云更新所有 ECS 基础信息成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "info"
+                    });
                 } else {
                     // 提示失败信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-warning")
-                    $("#notice").children("h4").text("Failed!");
-                    $("#notice").children("p").text("从阿里云更新所有 ECS 基础信息失败！");
+                    $.notify({
+                        title: "同步失败 : ",
+                        message: "从阿里云更新所有 ECS 基础信息失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
                 }
                 setTimeout(function () {
                     // 延迟300毫秒关闭loading遮盖层
-                    $(".overlay").css("display", "none");
+                    jQuery("#loading").hideLoading();
                 }, 300);
             });
         }

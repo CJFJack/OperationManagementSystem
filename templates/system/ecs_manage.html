@@ -42,19 +42,9 @@
 
     {#        表格区域#}
     {% if ecs_manage %}
-        <div class="row">
+        <div class="row" id="loading">
             <div class="col-md-12">
                 <div class="tile">
-                    {#                    Loading 遮盖层#}
-                    <div class="overlay" style="display: none">
-                        <div class="m-loader mr-4">
-                            <svg class="m-circular" viewBox="25 25 50 50">
-                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4"
-                                        stroke-miterlimit="10"/>
-                            </svg>
-                        </div>
-                        <h3 class="l-text">Loading</h3>
-                    </div>
                     {#                    表格数据区域#}
                     <div class="tile-body table-responsive" id="table">
                         <table class="table table-hover table-bordered" id="sampleTable"
@@ -129,47 +119,43 @@
     <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
     <script type="text/javascript">$('#sampleTable').DataTable();</script>
 
-    <script>
+    <!-- Notice-->
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-notify.min.js' %}"></script>
 
-        // 表格刷新
-        function table_data_fresh() {
-            let postUrl = "{% url 'system:ecs_table_refresh' %}";
-            $.post(postUrl, function (data) {
-                $('#table').html(data)
-            });
-        }
+    <script>
 
         // 同步所有ECS
         function sync_all_ecs() {
             let postUrl = "{% url 'system:sync_all_ecs_from_acs' %}";
             // 显示 loading 遮盖层
-            $(".overlay").css("display", "");
+            jQuery('#loading').showLoading();
             // 发送 post 请求
             $.post(postUrl, function (data) {
                 if (data.success) {
+                    // 刷新页面
                     location.reload();
-                    // 刷新表格数据
-                    table_data_fresh();
                     // 提示成功信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-success");
-                    $("#notice").children("h4").text("Success!");
-                    $("#notice").children("p").text("从阿里云同步所有 ECS 成功！");
-                    setTimeout(function () {
-                        // 延迟20秒后关闭提示信息
-                        $("#notice").css("display", "none");
-                    }, 20000);
+                    $.notify({
+                        title: "同步成功 : ",
+                        message: "从阿里云同步所有 ECS 成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "success"
+                    });
                 }
                 else {
                     // 提示失败信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-warning");
-                    $("#notice").children("h4").text("Failed!");
-                    $("#notice").children("p").text("从阿里云同步所有 ECS 失败！");
+                    $.notify({
+                        title: "同步失败 : ",
+                        message: "从阿里云同步所有 ECS 失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
                 }
                 setTimeout(function () {
                     // 延迟300毫秒关闭loading遮盖层
-                    $(".overlay").css("display", "none");
+                    jQuery('#loading').hideLoading();
                 }, 300);
             });
         }
@@ -178,27 +164,29 @@
         function update_all_ecs_info() {
             let postUrl = "{% url 'system:update_all_ecs_info' %}";
             // 显示 loading 遮盖层
-            $(".overlay").css("display", "");
+            jQuery('#loading').showLoading();
             // 发送 post 请求
             $.post(postUrl, function (data) {
                 if (data.success) {
-                    // 刷新表格数据
-                    table_data_fresh();
+                    // 刷新页面
+                    location.reload();
                     // 提示成功信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-success");
-                    $("#notice").children("h4").text("Success!");
-                    $("#notice").children("p").text("从阿里云更新所有 ECS 基础信息成功！");
-                    setTimeout(function () {
-                        // 延迟20秒后关闭提示信息
-                        $("#notice").css("display", "none");
-                    }, 20000);
+                    $.notify({
+                        title: "更新成功 : ",
+                        message: "从阿里云更新所有 ECS 基础信息成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "info"
+                    });
                 } else {
                     // 提示失败信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-warning")
-                    $("#notice").children("h4").text("Failed!");
-                    $("#notice").children("p").text("从阿里云更新所有 ECS 基础信息失败！");
+                    $.notify({
+                        title: "更新失败 : ",
+                        message: "从阿里云更新所有 ECS 基础信息失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
                 }
                 setTimeout(function () {
                     // 延迟300毫秒关闭loading遮盖层
@@ -211,31 +199,33 @@
         function update_all_ecs_resource() {
             let postUrl = "{% url 'system:update_all_ecs_monitor' %}";
             // 显示 loading 遮盖层
-            $(".overlay").css("display", "");
+            jQuery('#loading').showLoading();
             // 发送 post 请求
             $.post(postUrl, function (data) {
                 if (data.success) {
-                    // 刷新表格数据
-                    table_data_fresh();
+                    // 刷新页面
+                    location.reload();
                     // 提示成功信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-success");
-                    $("#notice").children("h4").text("Success!");
-                    $("#notice").children("p").text("从阿里云更新所有 ECS 监控信息成功！");
-                    setTimeout(function () {
-                        // 延迟20秒后关闭提示信息
-                        $("#notice").css("display", "none");
-                    }, 20000);
+                    $.notify({
+                        title: "更新成功 : ",
+                        message: "从阿里云更新所有 ECS 监控信息成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "warning"
+                    });
                 } else {
                     // 提示失败信息
-                    $("#notice").css("display", "");
-                    $("#notice").addClass("alert-warning")
-                    $("#notice").children("h4").text("Failed!");
-                    $("#notice").children("p").text("从阿里云更新所有 ECS 监控信息失败！");
+                    $.notify({
+                        title: "更新失败 : ",
+                        message: "从阿里云更新所有 ECS 监控信息失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
                 }
                 setTimeout(function () {
                     // 延迟300毫秒关闭loading遮盖层
-                    $(".overlay").css("display", "none");
+                    jQuery('#loading').hideLoading();
                 }, 300);
             });
         }

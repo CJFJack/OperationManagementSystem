@@ -7,14 +7,16 @@ from OperationManagementSystem.apps.system.models import ECS, Application, Appli
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from acs_api.acs_sync_all_ecs import sync_all_ecs
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from acs_api.acs_update_ecs_info import update_ecs_info
 from acs_api.acs_sync_all_slb import sync_all_slb
+from acs_api.acs_update_slb_health import update_slb_health
 from django.shortcuts import render, reverse
 from acs_api.acs_update_ecs_monitor import update_ecs_monitor
 from OperationManagementSystem.apps.system.forms import ApplicationForm
+from OperationManagementSystem.apps.operation.models import SLBHealthStatus
 
 import json
 import random
@@ -170,7 +172,11 @@ class ApplicationAdd(generic.View):
                     application.ECS_lists.add(ecs_obj)
             """添加应用族"""
             application_race_id = request.POST['select_application_race']
-            application.application_race_id = int(application_race_id)
+            if application_race_id == "0":
+                pass
+            else:
+                application.application_race_id = int(application_race_id)
+                application.save()
             """保存"""
             application.save()
             return HttpResponseRedirect(reverse('system:application_manage'))
@@ -298,7 +304,7 @@ def application_race_save(request, application_race_id):
 def application_race_delete(request, application_race_id):
     application_race = ApplicationRace.objects.get(pk=application_race_id)
     application_race.delete()
-    return HttpResponseRedirect(reverse('system:application_race'))
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -330,7 +336,7 @@ def update_all_slb_info(request):
                             create_date=slb['CreateTime'], network_type=slb['NetworkType'])
                     s.save()
                 else:
-                    s = SLB.objects.get(instanceid=slb['LoadBalancerId'])
+                    s = SLB.objects.get(instance_id=slb['LoadBalancerId'])
                     s.instance_id = slb['LoadBalancerId']
                     s.name = slb['LoadBalancerName']
                     s.status = slb['LoadBalancerStatus']
@@ -345,3 +351,60 @@ def update_all_slb_info(request):
                 if current_slb.instance_id not in slb_list:
                     current_slb.delete()
             return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def one_slb_health_update(request, slb_id):
+    try:
+        '''判断SLB实例是否存在'''
+        slb = get_object_or_404(SLB, pk=slb_id)
+    except:
+        return render_to_response(request.META['HTTP_REFERER'], {'success': False})
+    else:
+        try:
+            '''判断调用阿里云接口是否成功'''
+            result = update_slb_health(LoadBalancerId=slb.instance_id)
+        except:
+            return HttpResponse(json.dumps({'success': False, 'message': '网络超时，调用阿里云接口失败'}),
+                                content_type="application/json")
+        else:
+            if 'Message' in result:
+                '''判断调用阿里云是否返回报错信息'''
+                return HttpResponse(json.dumps({'success': False, 'message': result['Message']}),
+                                    content_type="application/json")
+            else:
+                '''无报错则开始处理返回数据'''
+                for sh in SLBHealthStatus.objects.filter(SLB_id=slb.id):
+                    '''先将该SLB下所属ECS状态更新为已移除'''
+                    sh.SLBStatus = 'removed'
+                    sh.save()
+                for r in result:
+                    try:
+                        '''判断数据库中是否存在ECS，没有则需要先到ECS页面同步ECS信息'''
+                        ecs = get_object_or_404(ECS, instance_id=r['ServerId'])
+                    except:
+                        return HttpResponse(json.dumps({'success': False, 'message': 'ECS不存在，请到ECS页面进行同步后再刷新SLB信息'}),
+                                            content_type="application/json")
+                    else:
+                        '''判断数据库中该SLB是否有对应的后端服务器记录，没有则增加，有则更新'''
+                        if not SLBHealthStatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
+                            sh = SLBHealthStatus(SLB_id=slb.id, ECS_id=ecs.id, SLBStatus='added',
+                                                 health_status=r['ServerHealthStatus'])
+                            sh.save()
+                        else:
+                            sh = SLBHealthStatus.objects.get(SLB_id=slb.id, ECS_id=ecs.id)
+                            sh.SLB_id = slb.id
+                            sh.ECS_id = ecs.id
+                            sh.SLBStatus = 'added'
+                            sh.health_status = r['ServerHealthStatus']
+                            sh.save()
+                return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def all_slb_health_update(request):
+    for slb in SLB.objects.all():
+        one_slb_health_update(request, slb_id=slb.id)
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")

@@ -65,9 +65,12 @@
             <ul class="treeview-menu">
                 <li><a class="treeview-item" href="{% url 'system:ecs_manage' %}"><i class="icon fa fa-circle-o"></i>
                     ECS管理</a></li>
-                <li><a class="treeview-item" href="{% url 'system:application_race' %}"><i class="icon fa fa-circle-o"></i> 应用族管理</a></li>
-                <li><a class="treeview-item" href="{% url 'system:application_manage' %}"><i class="icon fa fa-circle-o"></i> 应用管理</a></li>
-                <li><a class="treeview-item" href="{% url 'system:slb_manage' %}"><i class="icon fa fa-circle-o"></i> SLB管理</a></li>
+                <li><a class="treeview-item" href="{% url 'system:application_race' %}"><i
+                        class="icon fa fa-circle-o"></i> 应用族管理</a></li>
+                <li><a class="treeview-item" href="{% url 'system:application_manage' %}"><i
+                        class="icon fa fa-circle-o"></i> 应用管理</a></li>
+                <li><a class="treeview-item" href="{% url 'system:slb_manage' %}"><i class="icon fa fa-circle-o"></i>
+                    SLB管理</a></li>
             </ul>
         </li>
         <li><a class="app-menu__item" href=""><i class="app-menu__icon fa fa-edit"></i><span
@@ -97,8 +100,9 @@
 <script src="{% static 'js/popper.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
-<!-- The JavaScript plugin to display page loading on top-->
-<script src="{% static 'js/plugins/pace.min.js' %}"></script>
+<!--引用jquery ShowLoading-->
+<link href="{% static 'css/showLoading.css' %}" rel="stylesheet" media="screen"/>
+<script src="{% static 'js/jquery.showLoading.min.js' %}"></script>
 <!-- Page specific JavaScripts-->
 {% block custom_static %}{% endblock %}
 

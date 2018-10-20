@@ -44,16 +44,6 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="tile">
-                    {#                    Loading 遮盖层#}
-                    <div class="overlay" style="display: none">
-                        <div class="m-loader mr-4">
-                            <svg class="m-circular" viewBox="25 25 50 50">
-                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4"
-                                        stroke-miterlimit="10"/>
-                            </svg>
-                        </div>
-                        <h3 class="l-text">Loading</h3>
-                    </div>
                     {#                    表格数据区域#}
                     <div class="tile-body table-responsive" id="table">
                         <table class="table table-hover table-bordered" id="sampleTable"
@@ -77,8 +67,9 @@
                                         {% endfor %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'system:application_race_edit' application_race.id %}" type="button" class="btn btn-info">编辑</a>
-                                        <a href="{% url 'system:application_race_delete' application_race.id %}" type="button" class="btn btn-danger">删除</a>
+                                        <a href="{% url 'system:application_race_edit' application_race.id %}"
+                                           type="button" class="btn btn-info">编辑</a>
+                                        <a class="btn btn-danger" id="demoSwal{{ forloop.counter }}" href="#">删除</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -107,5 +98,39 @@
     <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
     <script type="text/javascript">$('#sampleTable').DataTable();</script>
+
+    <!--Delete Alarm-->
+    <script type="text/javascript" src="{% static 'js/plugins/sweetalert.min.js' %}"></script>
+    <script type="text/javascript">
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+        {% for application_race in application_race_list %}
+            $('#demoSwal{{ forloop.counter }}').click(function () {
+                swal({
+                    title: "Are you sure?",
+                    text: "You will not be able to recover this imaginary file!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel plx!",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        let postUrl = "{% url 'system:application_race_delete' application_race.id %}";
+                        $.post(postUrl, function (data) {
+                            if (data.success) {
+                                swal("Deleted!", "Your imaginary file has been deleted.", "success");
+                                location.reload();
+                            }
+                        })
+                    } else {
+                        swal("Cancelled", "Your imaginary file is safe :)", "error");
+                    }
+                });
+            });
+        {% endfor %}
+    </script>
 
 {% endblock %}
