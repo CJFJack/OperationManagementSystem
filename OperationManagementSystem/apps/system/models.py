@@ -124,6 +124,9 @@ class SLB(models.Model):
         verbose_name = u'负载均衡信息表'
         verbose_name_plural = verbose_name
 
+    def get_application_id_list(self):
+        return [int(application.application_id) for application in self.slbtoapplication_set.all()]
+
     def __unicode__(self):
         return self.name
 

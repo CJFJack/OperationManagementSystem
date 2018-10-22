@@ -65,7 +65,7 @@
                             {% for application in application_manage %}
                                 <tr>
                                     <td>
-                                        <a href="#">{{ application.fullname }}</a>
+                                        <a href="{% url 'system:application_change' application.id %}">{{ application.fullname }}</a>
                                     </td>
                                     <td>{{ application.short_name }}</td>
                                     <td>{{ application.config_dir_name }}</td>

@@ -20,19 +20,6 @@
             <li class="breadcrumb-item active"><a href="#">SLB 管理</a></li>
         </ul>
     </div>
-    {#        操作结果提示栏区域#}
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="bs-component">
-                <div class="alert alert-dismissible" id="notice" style="display: none;">
-                    <button class="close" type="button" data-dismiss="alert">×</button>
-                    <h4></h4>
-                    <p><a class="alert-link" href="#"></a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
     {#        按钮区域#}
     <div>
         <button class="btn btn-success" type="button" onclick="sync_all_slb()">同步SLB基本信息</button>
@@ -104,7 +91,7 @@
                                            class="btn btn-sm btn-info">刷新</a></td>
                                     <td>
                                         <button type="button" class="btn btn-link">
-                                            <a href="">{{ slb.instance_id }}</a>
+                                            <a href="{% url 'system:slb_change' slb.id %}">{{ slb.instance_id }}</a>
                                         </button>
                                     </td>
                                     <td>{{ slb.name }}</td>

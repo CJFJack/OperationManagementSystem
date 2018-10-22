@@ -1,0 +1,138 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> 修改 SLB 关联应用</h1>
+            <p> 查看SLB基本信息，后端 ECS 健康状态，修改 SLB 关联应用</p>
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">系统管理</li>
+            <li class="breadcrumb-item"><a href="{% url 'system:slb_manage' %}">SLB 管理</a></li>
+            <li class="breadcrumb-item active"><a href="#">修改 SLB 关联应用</a></li>
+        </ul>
+    </div>
+
+    {#    表单区域#}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <form class="form-horizontal" action="{% url 'system:slb_change' slb.id %}"
+                          method="post">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">实例ID</label>
+                            <div class="col-md-5">
+                                {{ slb.instance_id }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">实例简称</label>
+                            <div class="col-md-5">
+                                {{ slb.name }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">实例状态</label>
+                            <div class="col-md-5">
+                                {{ slb.status }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">实例IP</label>
+                            <div class="col-md-5">
+                                {{ slb.ip }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">创建时间</label>
+                            <div class="col-md-5">
+                                {{ slb.create_date }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">后端关联ECS状态</label>
+                            <div class="col-md-5">
+                                {% for ecs in slb.slbhealthstatus_set.all %}
+                                    <p>
+                                    <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% if ecs.SLBStatus == "added" %}
+                                        <span class="text-info">已添加</span>{% else %}<span
+                                            class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% if ecs.SLBStatus == "added" %}
+                                        {% if ecs.health_status == "normal" %}
+                                            <span class="text-success">正常</span>&nbsp;
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        {% elif ecs.health_status == "abnormal" %}
+                                            <span class="text-danger">异常</span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        {% else %}<span class="text-warning">正在检查</span>&nbsp;
+                                        {% endif %}
+                                    {% else %}
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">关联应用</label>
+                            <div class="col-md-8">
+                                <select class="form-control" id="demoSelect1" multiple="multiple" name="select_application[]">
+                                    <optgroup label="选择关联应用">
+                                        {% for application in application_list %}
+                                            <option value="{{ application.id }}"
+                                                    {% if application.id in slb.get_application_id_list %}selected{% endif %}>{{ application.fullname }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit" name="slb_change"><i
+                                    class="fa fa-fw fa-lg fa-check-circle"></i>保存
+                            </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-secondary"
+                                                          href="{% url 'system:slb_manage' %}"><i
+                                class="fa fa-fw fa-lg fa-times-circle"></i>返回</a>
+                        </div>
+                        <input type="hidden" name="modified_user" value="{{ request.user.username }}">
+                        <input type="hidden" name="random_id" value="">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block custom_static %}
+
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-datepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/select2.min.js' %}"></script>
+    <script type="text/javascript">
+        $('#sl').click(function () {
+            $('#tl').loadingBtn();
+            $('#tb').loadingBtn({text: "Signing In"});
+        });
+
+        $('#el').click(function () {
+            $('#tl').loadingBtnComplete();
+            $('#tb').loadingBtnComplete({html: "Sign In"});
+        });
+
+        $('#demoDate').datepicker({
+            format: "dd/mm/yyyy",
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        $('#demoSelect1').select2();
+    </script>
+
+{% endblock %}

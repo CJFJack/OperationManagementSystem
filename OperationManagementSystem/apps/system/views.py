@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.views import generic
 from OperationManagementSystem.apps.system.models import ECS, Application, ApplicationRace, SLB
+from OperationManagementSystem.apps.operation.models import SLBToApplication
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from acs_api.acs_sync_all_ecs import sync_all_ecs
@@ -460,3 +461,30 @@ def slb_remove_backend_server(request, slb_id, server_id):
         else:
             one_slb_health_update(request, slb.id)
             return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class SLBChangeView(generic.View):
+    def get(self, request, slb_id):
+        slb = SLB.objects.get(pk=slb_id)
+        application_list = Application.objects.all()
+        return render(request, 'system/slb_change.html', {'slb': slb, 'application_list': application_list})
+
+    def post(self, request, slb_id):
+        slb = SLB.objects.get(pk=slb_id)
+        select_application_id = request.POST.getlist('select_application[]', '')
+        if select_application_id:
+            for application_id in select_application_id:
+                if SLBToApplication.objects.filter(application_id=application_id, SLB_id=slb.id):
+                    pass
+                else:
+                    slb_to_application = SLBToApplication(application_id=application_id, SLB_id=slb.id)
+                    slb_to_application.save()
+        for application_id in slb.get_application_id_list():
+            if str(application_id) in select_application_id:
+                pass
+            else:
+                slb_to_application = SLBToApplication.objects.get(application_id=application_id, SLB_id=slb.id)
+                slb_to_application.delete()
+        return HttpResponseRedirect(reverse('system:slb_manage'))
+
