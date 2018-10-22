@@ -488,3 +488,4 @@ class SLBChangeView(generic.View):
                 slb_to_application.delete()
         return HttpResponseRedirect(reverse('system:slb_manage'))
 
+

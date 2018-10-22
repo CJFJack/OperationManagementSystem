@@ -1,0 +1,150 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    {#        表格有数据时展示#}
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> 配置管理</h1>
+            {% if application_list %}
+                <p> 修改应用配置文件，分发配置文件，管理应用关联 SLB 后端服务器状态</p>
+            {% else %}
+                <p>No application are available.</p>
+            {% endif %}
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">系统管理</li>
+            <li class="breadcrumb-item active"><a href="#">配置管理</a></li>
+        </ul>
+    </div>
+
+    {% if application_list %}
+        {#        表格区域#}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    {#                    表格数据区域#}
+                    <div class="tile-body table-responsive" id="table">
+                        <table class="table table-hover table-bordered" id="sampleTable"
+                               style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+                            <thead>
+                            <tr>
+                                <th>站点名称</th>
+                                <th>发布注意事项</th>
+                                <th class="text-center">配置文件</th>
+                                <th class="text-center">所属ECS&nbsp;&nbsp;&nbsp;配置状态&nbsp;&nbsp;&nbsp;操作</th>
+                                <th class="text-center">所属ECS&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;操作</th>
+                                <th>健康检查</th>
+                                <th>配置修改人</th>
+                                <th>修改日期</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for application in application_list %}
+                                <tr>
+                                    <td>
+                                        <a href=""
+                                           target="_blank">{{ application.fullname }}</a>
+                                    </td>
+                                    <td>{{ application.deployattention }}</td>
+                                    <td align="right">
+                                        {% for configfile in application.configfile_set.all %}
+                                            <p>
+                                                {{ configfile.filename }}&nbsp;
+                                                <a class="btn btn-danger"
+                                                   href="">修改</a>&nbsp;
+                                                <a class="btn btn-primary"
+                                                   href="">历史记录</a>&nbsp;
+                                            </p>
+                                        {% endfor %}
+                                    </td>
+                                    <td align="right" id="td_ecs_{{ application.id }}">
+                                        {% for r in application.release_set.all %}
+                                            {% if r.ECS.name in application.get_ECSlists_list %}
+                                                <p>
+                                                    {{ r.ECS }}&nbsp;
+                                                    {% if r.status == "N" %}
+                                                        <span class="text-danger">待生效</span>&nbsp;&nbsp;&nbsp;
+                                                        <a class="btn btn-success"
+                                                           href="javascript:void(0);"
+                                                           onclick="DeployConfig('{{ r.id }}', '{{ r.ECS.name }}', '{{ site.id }}', '{{ site.fullname }}')">发布</a>
+                                                        &nbsp;
+                                                    {% endif %}
+                                                    {% if r.status == "Y" %}
+                                                        <span class="text-success">已生效</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        &nbsp;
+                                                        &nbsp;
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        &nbsp;&nbsp;
+                                                    {% endif %}
+                                                </p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td align="right" id=td_slb_{{ site.id }}>
+                                        {% for ecs in application.get_one_slb.slbhealthstatus_set.all %}
+                                            <p>
+                                                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                {% if ecs.SLBstatus == "added" %}
+                                                    <span class="text-success">已添加</span>{% else %}
+                                                    <span
+                                                            class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <span>
+                                {% if ecs.SLBstatus == "added" %}
+                                    {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% else %}<span class="text-danger">正在检查</span>&nbsp;&nbsp;
+                                    {% endif %}
+                                {% else %}
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    &nbsp;&nbsp;
+                                {% endif %}
+                            </span>
+                                                <span>
+                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning" href="javascript:void(0)"
+                                                                    onclick="SiteRemoveBackendServer('{{ site.id }}', '{{ site.fullname }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">移除</a>{% endif %}
+                                                    {% if ecs.SLBstatus == "removed" %}
+                                                        <a class="btn btn-success" href="javascript:void(0)"
+                                                           onclick="SiteAddBackendServer('{{ site.id }}', '{{ site.fullname }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">添加</a>{% endif %}
+                            </span>
+                                            </p>
+                                        {% endfor %}
+                                    </td>
+                                    <td><a class="btn btn-info" href="javascript:void(0);"
+                                           onclick="MoreHealthRefresh('{{ site.id }}', '{{ site.fullname }}')">刷新</a>
+                                    </td>
+                                    <td>
+                                        {% for config in application.configfile_set.all %}
+                                            <p>{{ config.modified_user }}</p>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for config in application.configfile_set.all %}
+                                            <p>{{ config.modified_time }}</p>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body">请先添加应用</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
