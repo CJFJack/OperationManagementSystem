@@ -31,5 +31,10 @@ urlpatterns = [
     # slb
     url(r'^slb_manage/$', views.SLBListView.as_view(), name='slb_manage'),
     url(r'^sync_all_slb_from_acs/$', views.update_all_slb_info, name='sync_all_slb_from_acs'),
+    url(r'^one_slb_health_update/(?P<slb_id>[0-9]+)/$', views.one_slb_health_update, name='one_slb_health_update'),
     url(r'^all_slb_health_update/$', views.all_slb_health_update, name='all_slb_health_update'),
+    url(r'^slb_add_backend_server/(?P<slb_id>[0-9]+)/(?P<server_id>[0-9]+)/$', views.slb_add_backend_server,
+        name='slb_add_backend_server'),
+    url(r'^slb_remove_backend_server/(?P<slb_id>[0-9]+)/(?P<server_id>[0-9]+)/$', views.slb_remove_backend_server,
+        name='slb_add_backend_server'),
 ]

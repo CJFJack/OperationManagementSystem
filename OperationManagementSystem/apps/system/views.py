@@ -13,6 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 from acs_api.acs_update_ecs_info import update_ecs_info
 from acs_api.acs_sync_all_slb import sync_all_slb
 from acs_api.acs_update_slb_health import update_slb_health
+from acs_api.acs_slb_backend_server_add import add_backend_server
+from acs_api.acs_slb_backend_server_remove import remove_backend_server
 from django.shortcuts import render, reverse
 from acs_api.acs_update_ecs_monitor import update_ecs_monitor
 from OperationManagementSystem.apps.system.forms import ApplicationForm
@@ -408,3 +410,53 @@ def all_slb_health_update(request):
     for slb in SLB.objects.all():
         one_slb_health_update(request, slb_id=slb.id)
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def slb_add_backend_server(request, slb_id, server_id):
+    slb = get_object_or_404(SLB, pk=slb_id)
+    slb_instance_id = slb.instance_id
+    ecs = ECS.objects.get(pk=server_id)
+    server_dict = {}
+    server_list = []
+    server_dict['ServerId'] = str(ecs.instance_id)
+    server_dict['Weight'] = str(100)
+    server_list.append(server_dict)
+    backend_servers = json.dumps(server_list)
+    try:
+        result = add_backend_server(LoadBalancerId=slb_instance_id, BackendServers=backend_servers)
+    except:
+        return HttpResponse(json.dumps({'success': False, 'message': '网络超时，调用阿里云接口失败'}),
+                            content_type="application/json")
+    else:
+        if 'Message' in result:
+            return HttpResponse(json.dumps({'success': False, 'message': result['Message']}),
+                                content_type="application/json")
+        else:
+            one_slb_health_update(request, slb.id)
+            return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def slb_remove_backend_server(request, slb_id, server_id):
+    slb = get_object_or_404(SLB, pk=slb_id)
+    slb_instance_id = slb.instance_id
+    ecs = ECS.objects.get(pk=server_id)
+    backend_servers = []
+    backend_servers.append(ecs.instance_id)
+    backend_servers = json.dumps(backend_servers)
+    try:
+        r = remove_backend_server(LoadBalancerId=slb_instance_id, BackendServers=backend_servers)
+        print r
+    except:
+        return HttpResponse(json.dumps({'success': False, 'message': '网络超时，调用阿里云接口失败'}),
+                            content_type="application/json")
+    else:
+        if 'Message' in r:
+            return HttpResponse(json.dumps({'success': False, 'message': r['Message']}),
+                                content_type="application/json")
+        else:
+            one_slb_health_update(request, slb.id)
+            return HttpResponse(json.dumps({'success': True}), content_type="application/json")

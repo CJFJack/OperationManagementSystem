@@ -86,25 +86,25 @@
                                                 {% endif %}
                                                 <span>
                                     {% if ecs.SLBStatus == "added" %}<a href="javascript:void(0);"
-                                                                        id="removebackendserver{{ slb.id }}"
-                                                                        onclick="RemoveBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')"
+                                                                        id="remove_backend_server{{ slb.id }}"
+                                                                        onclick="remove_backend_server('{{ slb.id }}', '{{ ecs.ECS_id }}')"
                                                                         type="button"
                                                                         class="btn btn-sm btn-warning">移除</a>{% endif %}
                                                     {% if ecs.SLBStatus == "removed" %}<a href="javascript:void(0);"
-                                                                                          id="addbackendserver{{ slb.id }}"
-                                                                                          onclick="AddBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')"
+                                                                                          id="add_backend_server{{ slb.id }}"
+                                                                                          onclick="add_backend_server('{{ slb.id }}', '{{ ecs.ECS_id }}')"
                                                                                           type="button"
                                                                                           class="btn btn-sm btn-success">添加</a>{% endif %}
                                 </span>
                                             </p>
                                         {% endfor %}
                                     </td>
-                                    <td><a href="javascript:void(0);" id="healthrefresh{{ slb.id }}"
-                                           onclick="HealthRefresh('{{ slb.id }}', '{{ slb.instanceid }}')" type="button"
+                                    <td><a href="javascript:void(0);" id="update_one_ecs_health_info{{ slb.id }}"
+                                           onclick="update_one_ecs_health_info({{ slb.id }})" type="button"
                                            class="btn btn-sm btn-info">刷新</a></td>
                                     <td>
                                         <button type="button" class="btn btn-link">
-                                            <a href="' slb.id %}">{{ slb.instance_id }}</a>
+                                            <a href="">{{ slb.instance_id }}</a>
                                         </button>
                                     </td>
                                     <td>{{ slb.name }}</td>
@@ -204,8 +204,8 @@
                     location.reload();
                     // 提示成功信息
                     $.notify({
-                        title: "同步成功 : ",
-                        message: "从阿里云更新所有 ECS 基础信息成功！",
+                        title: "刷新成功 : ",
+                        message: "从阿里云刷新所有 SLB 健康信息成功！",
                         icon: 'fa fa-check'
                     }, {
                         type: "info"
@@ -213,8 +213,113 @@
                 } else {
                     // 提示失败信息
                     $.notify({
-                        title: "同步失败 : ",
-                        message: "从阿里云更新所有 ECS 基础信息失败！",
+                        title: "刷新失败 : ",
+                        message: "从阿里云刷新所有 SLB 健康信息失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    jQuery("#loading").hideLoading();
+                }, 300);
+            });
+        }
+
+        // 刷新单个SLB健康信息
+        function update_one_ecs_health_info(slb_id, server_id) {
+            let postUrl = "/system/one_slb_health_update/" + slb_id + "/";
+            // 显示 loading 遮盖层
+            jQuery("#loading").showLoading();
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 刷新页面
+                    location.reload();
+                    // 提示成功信息
+                    $.notify({
+                        title: "刷新成功 : ",
+                        message: "从阿里云刷新 SLB 基础信息成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "info"
+                    });
+                } else {
+                    // 提示失败信息
+                    $.notify({
+                        title: "刷新失败 : ",
+                        message: "从阿里云刷新 SLB 基础信息失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    jQuery("#loading").hideLoading();
+                }, 300);
+            });
+        }
+
+        // 移除 slb 后端服务器
+        function remove_backend_server(slb_id, server_id) {
+            let postUrl = "/system/slb_remove_backend_server/" + slb_id + "/" + server_id + "/";
+            // 显示 loading 遮盖层
+            jQuery("#loading").showLoading();
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 刷新页面
+                    location.reload();
+                    // 提示成功信息
+                    $.notify({
+                        title: "移除成功 : ",
+                        message: "从阿里云移除 SLB 后端服务器成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "warning"
+                    });
+                } else {
+                    // 提示失败信息
+                    $.notify({
+                        title: "移除失败 : ",
+                        message: "从阿里云移除 SLB 后端服务器失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    jQuery("#loading").hideLoading();
+                }, 300);
+            });
+        }
+
+        // 添加 slb 后端服务器
+        function add_backend_server(slb_id, server_id) {
+            let postUrl = "/system/slb_add_backend_server/" + slb_id + "/" + server_id + "/";
+            // 显示 loading 遮盖层
+            jQuery("#loading").showLoading();
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 刷新页面
+                    location.reload();
+                    // 提示成功信息
+                    $.notify({
+                        title: "添加成功 : ",
+                        message: "从阿里云添加 SLB 后端服务器成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "success"
+                    });
+                } else {
+                    // 提示失败信息
+                    $.notify({
+                        title: "添加失败 : ",
+                        message: "从阿里云添加 SLB 后端服务器失败！",
                         icon: 'fa fa-check'
                     }, {
                         type: "danger"
