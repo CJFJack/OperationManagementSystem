@@ -47,7 +47,7 @@
                             {% for application in application_list %}
                                 <tr>
                                     <td>
-                                        <a href=""
+                                        <a href="{% url 'system:application_change' application.id %}"
                                            target="_blank">{{ application.fullname }}</a>
                                     </td>
                                     <td>{{ application.deployattention }}</td>
@@ -56,33 +56,16 @@
                                             <p>
                                                 {{ configfile.filename }}&nbsp;
                                                 <a class="btn btn-danger"
-                                                   href="">修改</a>&nbsp;
+                                                   href="{% url 'config:config_change' configfile.id %}">修改</a>&nbsp;
                                                 <a class="btn btn-primary"
                                                    href="">历史记录</a>&nbsp;
                                             </p>
                                         {% endfor %}
                                     </td>
                                     <td align="right" id="td_ecs_{{ application.id }}">
-                                        {% for r in application.release_set.all %}
-                                            {% if r.ECS.name in application.get_ECSlists_list %}
-                                                <p>
-                                                    {{ r.ECS }}&nbsp;
-                                                    {% if r.status == "N" %}
-                                                        <span class="text-danger">待生效</span>&nbsp;&nbsp;&nbsp;
-                                                        <a class="btn btn-success"
-                                                           href="javascript:void(0);"
-                                                           onclick="DeployConfig('{{ r.id }}', '{{ r.ECS.name }}', '{{ site.id }}', '{{ site.fullname }}')">发布</a>
-                                                        &nbsp;
-                                                    {% endif %}
-                                                    {% if r.status == "Y" %}
-                                                        <span class="text-success">已生效</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                                        &nbsp;
-                                                        &nbsp;
-                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                        &nbsp;&nbsp;
-                                                    {% endif %}
-                                                </p>
-                                            {% endif %}
+                                        {% for r in application.ECS_lists.all %}
+                                            {{ r.name }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            {{ application.release_set.all }}
                                         {% endfor %}
                                     </td>
                                     <td align="right" id=td_slb_{{ site.id }}>
@@ -126,7 +109,7 @@
                                     </td>
                                     <td>
                                         {% for config in application.configfile_set.all %}
-                                            <p>{{ config.modified_time }}</p>
+                                            <p>{{ config.modified_time|date:"Y-m-d H:i:s" }}</p>
                                         {% endfor %}
                                     </td>
                                 </tr>

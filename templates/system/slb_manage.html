@@ -105,7 +105,7 @@
                                         {% if slb.network_type == "vpc" %}
                                             专有网络{% endif %}
                                     </td>
-                                    <td>{{ slb.create_date }}</td>
+                                    <td>{{ slb.create_date|date:"Y-m-d H:i:s" }}</td>
                                     <td>
                                         {% for application in slb.slbtoapplication_set.all %}
                                             <p>{{ application }}</p>

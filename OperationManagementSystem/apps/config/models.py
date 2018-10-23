@@ -14,6 +14,10 @@ class Configfile(models.Model):
     modified_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
     history = HistoricalRecords(verbose_name=u'修改历史记录')
 
+    def get_application_race_application_list(self):
+        return [application for application in Application.objects.all()
+                if application.application_race_id == self.application.application_race_id]
+
     class Meta:
         verbose_name = u'配置文件信息表'
         verbose_name_plural = verbose_name

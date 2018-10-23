@@ -131,7 +131,25 @@
                             <label class="control-label col-md-2">发布注意事项</label>
                             <div class="col-md-8">
                             <textarea class="form-control" rows="4" name="deploy_attention"
-                                      value="{{ application.deploy_attention }}"></textarea>
+                                      value="{{ application.deploy_attention }}">{{ application.deploy_attention }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">修改人</label>
+                            <div class="col-md-5">
+                                {{ application.modified_user }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">修改时间</label>
+                            <div class="col-md-5">
+                                {{ application.modified_time|date:"Y-m-d H:i:s" }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">配置文件修改记录</label>
+                            <div class="col-md-5">
+
                             </div>
                         </div>
                         <div class="tile-footer">

@@ -1,0 +1,106 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    {#        表格有数据时展示#}
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> {{ configfile.application.fullname }} 配置修改</h1>
+            <p> 修改 {{ configfile.filename }} 配置</p>
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">系统管理</li>
+            <li class="breadcrumb-item"><a href="{% url 'config:configfile' %}">配置管理</a></li>
+            <li class="breadcrumb-item active"><a href="#">配置修改</a></li>
+        </ul>
+    </div>
+
+    {#    表单区域#}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <form class="form-horizontal" action="{% url 'config:config_change_save' configfile.id %}"
+                          method="post">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">站点名</label>
+                            <div class="col-md-5">
+                                {{ configfile.application.fullname }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">配置文件名</label>
+                            <div class="col-md-5">
+                                {{ configfile.filename }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">修改涉及应用</label>
+                            <div class="col-md-6">
+                                {% if "logger" not in configfile.filename %}
+                                    <select class="form-control" id="demoSelect1" multiple="multiple"
+                                            name="select_application_id[]">
+                                        <optgroup label="选择修改应用">
+                                            {% for application in configfile.get_application_race_application_list %}
+                                                <option value="{{ application.id }}"
+                                                        selected>{{ application.fullname }}</option>
+                                            {% endfor %}
+                                        </optgroup>
+                                    </select>
+                                {% else %}
+                                    {{ configfile.application.fullname }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">配置内容</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" rows="20" name="content"
+                                          value="{{ configfile.content }}">{{ configfile.content }}</textarea>
+                            </div>
+                        </div>
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit" name="config_change_save"><i
+                                    class="fa fa-fw fa-lg fa-check-circle"></i>保存
+                            </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-secondary"
+                                                          href="{% url 'config:configfile' %}"><i
+                                class="fa fa-fw fa-lg fa-times-circle"></i>返回</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block custom_static %}
+
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-datepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/select2.min.js' %}"></script>
+    <script type="text/javascript">
+        $('#sl').click(function () {
+            $('#tl').loadingBtn();
+            $('#tb').loadingBtn({text: "Signing In"});
+        });
+
+        $('#el').click(function () {
+            $('#tl').loadingBtnComplete();
+            $('#tb').loadingBtnComplete({html: "Sign In"});
+        });
+
+        $('#demoDate').datepicker({
+            format: "dd/mm/yyyy",
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        $('#demoSelect1').select2();
+    </script>
+
+{% endblock %}
