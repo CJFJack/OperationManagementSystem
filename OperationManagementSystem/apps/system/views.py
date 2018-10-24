@@ -167,12 +167,13 @@ class ApplicationAdd(generic.View):
                     application.configfile_set.create(filename=config_file)
             """添加修改人信息"""
             application.modified_user = request.user.username
-            """添加关联ECS"""
+            """添加关联ECS，生成配置文件发布状态记录"""
             ecs_id_list = request.POST.getlist('select_ecs[]', '')
             if ecs_id_list:
                 for ecs_id in ecs_id_list:
                     ecs_obj = ECS.objects.get(pk=ecs_id)
                     application.ECS_lists.add(ecs_obj)
+                    application.release_set.create(ECS_id=ecs_id, application_id=application.id)
             """添加应用族"""
             application_race_id = request.POST['select_application_race']
             if application_race_id == "0":
@@ -237,28 +238,43 @@ def application_save(request, application_id):
         else:
             a = application.configfile_set.get(filename=config_file)
             a.delete()
-    """修改所属ECS"""
+    """修改所属ECS，并更新配置文件发布状态记录"""
     ecs_id_list = request.POST.getlist('select_ecs[]', '')
     if ecs_id_list:
         for ecs_id in ecs_id_list:
+            """添加所属ECS"""
             if ecs_id in application.get_ecs_id_list():
                 pass
             else:
                 ecs_obj = ECS.objects.get(pk=int(ecs_id))
                 application.ECS_lists.add(ecs_obj)
+            """添加配置文件发布状态记录"""
+            if application.release_set.filter(ECS_id=ecs_id):
+                pass
+            else:
+                application.release_set.create(ECS_id=ecs_id, application_id=application.id)
+    """删除所属ECS"""
     for ecs_id in application.get_ecs_id_list():
         if ecs_id in ecs_id_list:
             pass
         else:
             ecs_obj = ECS.objects.get(pk=int(ecs_id))
             application.ECS_lists.remove(ecs_obj)
+    """删除配置文件发布状态记录"""
+    for r in application.release_set.all():
+        if str(r.ECS_id) in ecs_id_list:
+            pass
+        else:
+            r.delete()
     """修改所属应用族"""
     application_race_id = request.POST['select_application_race']
     if application_race_id == '0':
         application.application_race_id = None
     else:
         application.application_race_id = int(application_race_id)
+    """保存对象"""
     application.save()
+    """生成发布状态记录"""
     return HttpResponseRedirect(reverse('system:application_manage'))
 
 

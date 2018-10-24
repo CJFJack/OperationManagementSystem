@@ -63,9 +63,12 @@
                                         {% endfor %}
                                     </td>
                                     <td align="right" id="td_ecs_{{ application.id }}">
-                                        {% for r in application.ECS_lists.all %}
-                                            {{ r.name }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                            {{ application.release_set.all }}
+                                        {% for r in application.release_set.all %}
+                                            <p>
+                                                {{ r.ECS.name }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                                {% if r.status == "Y" %}已发布{% else %}<span class="text-danger">待发布</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <button type="button" class="btn btn-outline-info">发布</button>
+                                            </p>
                                         {% endfor %}
                                     </td>
                                     <td align="right" id=td_slb_{{ site.id }}>
