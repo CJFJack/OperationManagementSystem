@@ -24,7 +24,7 @@
 
     {% if application_list %}
         {#        表格区域#}
-        <div class="row">
+        <div class="row" id="loading">
             <div class="col-md-12">
                 <div class="tile">
                     {#                    表格数据区域#}
@@ -66,8 +66,10 @@
                                         {% for r in application.release_set.all %}
                                             <p>
                                                 {{ r.ECS.name }}&nbsp;&nbsp;&nbsp;&nbsp;
-                                                {% if r.status == "Y" %}已发布{% else %}<span class="text-danger">待发布</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
-                                                <button type="button" class="btn btn-outline-info">发布</button>
+                                                {% if r.status == "Y" %}已发布{% else %}
+                                                    <span class="text-danger">待发布</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <button type="button" class="btn btn-outline-info" onclick="config_deploy('{{ r.id }}')">发布
+                                                </button>
                                             </p>
                                         {% endfor %}
                                     </td>
@@ -132,5 +134,58 @@
             </div>
         </div>
     {% endif %}
+
+{% endblock %}
+
+{% block custom_static %}
+
+    <!-- Data table plugin-->
+    <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
+    <script type="text/javascript">$('#sampleTable').DataTable();</script>
+
+    <!-- Notice-->
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-notify.min.js' %}"></script>
+
+    <!-- function-->
+    <script>
+
+        // 发布分发配置文件
+        function config_deploy(release_id) {
+            let postUrl = "/operation/config_deploy/" + release_id + "/";
+            // 显示 loading 遮盖层
+            jQuery('#loading').showLoading();
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 刷新页面
+                    location.reload();
+                    // 提示成功信息
+                    $.notify({
+                        title: "发布成功 : ",
+                        message: "生成及分发应用配置文件成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "success"
+                    });
+                }
+                else {
+                    // 提示失败信息
+                    $.notify({
+                        title: "发布失败 : ",
+                        message: "生成及分发应用配置文件失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    jQuery('#loading').hideLoading();
+                }, 300);
+            });
+        }
+
+    </script>
 
 {% endblock %}

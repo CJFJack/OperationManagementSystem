@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render, reverse
 from OperationManagementSystem.apps.config.models import Configfile
 from OperationManagementSystem.apps.system.models import Application
+
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -35,6 +36,7 @@ def configfile_change_save(request, configfile_id):
     configfile.content = request.POST['content']
     configfile.save()
     return HttpResponseRedirect(reverse('config:configfile'))
+
 
 
 
