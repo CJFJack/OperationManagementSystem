@@ -72,23 +72,27 @@
                                                     <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                                 {% endif %}
                                                 <span>
-                                    {% if ecs.SLBStatus == "added" %}<a href="javascript:void(0);"
-                                                                        id="remove_backend_server{{ slb.id }}"
-                                                                        onclick="remove_backend_server('{{ slb.id }}', '{{ ecs.ECS_id }}')"
-                                                                        type="button"
-                                                                        class="btn btn-sm btn-warning">移除</a>{% endif %}
-                                                    {% if ecs.SLBStatus == "removed" %}<a href="javascript:void(0);"
-                                                                                          id="add_backend_server{{ slb.id }}"
-                                                                                          onclick="add_backend_server('{{ slb.id }}', '{{ ecs.ECS_id }}')"
-                                                                                          type="button"
-                                                                                          class="btn btn-sm btn-success">添加</a>{% endif %}
-                                </span>
+                                                {% if ecs.SLBStatus == "added" %}
+                                                    <a href="javascript:void(0);"
+                                                       id="remove_backend_server{{ slb.id }}"
+                                                       onclick="remove_backend_server('{{ slb.id }}', '{{ ecs.ECS_id }}')"
+                                                       type="button"
+                                                       class="btn btn-outline-warning">移除</a>
+                                                {% endif %}
+                                                    {% if ecs.SLBStatus == "removed" %}
+                                                        <a href="javascript:void(0);"
+                                                           id="add_backend_server{{ slb.id }}"
+                                                           onclick="add_backend_server('{{ slb.id }}', '{{ ecs.ECS_id }}')"
+                                                           type="button"
+                                                           class="btn btn-outline-success">添加</a>
+                                                    {% endif %}
+                                                </span>
                                             </p>
                                         {% endfor %}
                                     </td>
                                     <td><a href="javascript:void(0);" id="update_one_ecs_health_info{{ slb.id }}"
                                            onclick="update_one_ecs_health_info({{ slb.id }})" type="button"
-                                           class="btn btn-sm btn-info">刷新</a></td>
+                                           class="btn btn-outline-info">刷新</a></td>
                                     <td>
                                         <button type="button" class="btn btn-link">
                                             <a href="{% url 'system:slb_change' slb.id %}">{{ slb.instance_id }}</a>

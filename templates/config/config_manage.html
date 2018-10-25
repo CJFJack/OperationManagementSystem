@@ -55,9 +55,9 @@
                                         {% for configfile in application.configfile_set.all %}
                                             <p>
                                                 {{ configfile.filename }}&nbsp;
-                                                <a class="btn btn-danger"
+                                                <a class="btn btn-outline-danger"
                                                    href="{% url 'config:config_change' configfile.id %}">修改</a>&nbsp;
-                                                <a class="btn btn-primary"
+                                                <a class="btn btn-outline-primary"
                                                    href="">历史记录</a>&nbsp;
                                             </p>
                                         {% endfor %}
@@ -68,43 +68,38 @@
                                                 {{ r.ECS.name }}&nbsp;&nbsp;&nbsp;&nbsp;
                                                 {% if r.status == "Y" %}已发布{% else %}
                                                     <span class="text-danger">待发布</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
-                                                <button type="button" class="btn btn-outline-info" onclick="config_deploy('{{ r.id }}')">发布
+                                                <button type="button" class="btn btn-outline-success"
+                                                        onclick="config_deploy('{{ r.id }}')">发布
                                                 </button>
                                             </p>
                                         {% endfor %}
                                     </td>
                                     <td align="right" id=td_slb_{{ site.id }}>
-                                        {% for ecs in application.get_one_slb.slbhealthstatus_set.all %}
+                                        {% for i in application.slbtoapplication_set.all.0.SLB.slbhealthstatus_set.all %}
                                             <p>
-                                                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                                {% if ecs.SLBstatus == "added" %}
-                                                    <span class="text-success">已添加</span>{% else %}
-                                                    <span
-                                                            class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
-                                                <span>
-                                {% if ecs.SLBstatus == "added" %}
-                                    {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    {% else %}<span class="text-danger">正在检查</span>&nbsp;&nbsp;
-                                    {% endif %}
-                                {% else %}
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    &nbsp;&nbsp;
-                                {% endif %}
-                            </span>
-                                                <span>
-                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning" href="javascript:void(0)"
-                                                                    onclick="SiteRemoveBackendServer('{{ site.id }}', '{{ site.fullname }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">移除</a>{% endif %}
-                                                    {% if ecs.SLBstatus == "removed" %}
-                                                        <a class="btn btn-success" href="javascript:void(0)"
-                                                           onclick="SiteAddBackendServer('{{ site.id }}', '{{ site.fullname }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">添加</a>{% endif %}
-                            </span>
+                                                {{ i.ECS }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                                {% if i.SLBStatus == "added" %}已添加{% else %}
+                                                    <span class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                                                {% if i.health_status == "normal" %}
+                                                    正常{% elif i.health_status == "abnormal" %}
+                                                    <span class="text-danger">异常</span>{% else %}
+                                                    <span class="text-danger">正在检查</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                                                {% if i.SLBStatus == "added" %}
+                                                    <a href="javascript:void(0);"
+                                                       onclick="remove_backend_server('{{ i.SLB_id }}', '{{ i.ECS_id }}')"
+                                                       type="button"
+                                                       class="btn btn-outline-warning">移除</a>
+                                                {% endif %}
+                                                {% if i.SLBStatus == "removed" %}
+                                                    <a href="javascript:void(0);"
+                                                       onclick="add_backend_server('{{ i.SLB_id }}', '{{ i.ECS_id }}')"
+                                                       type="button"
+                                                       class="btn btn-outline-success">添加</a>
+                                                {% endif %}
                                             </p>
                                         {% endfor %}
                                     </td>
-                                    <td><a class="btn btn-info" href="javascript:void(0);"
+                                    <td><a class="btn btn-outline-info" href="javascript:void(0);"
                                            onclick="MoreHealthRefresh('{{ site.id }}', '{{ site.fullname }}')">刷新</a>
                                     </td>
                                     <td>
@@ -183,6 +178,76 @@
                     // 延迟300毫秒关闭loading遮盖层
                     jQuery('#loading').hideLoading();
                 }, 300);
+            });
+        }
+
+        // 移除 slb 后端服务器
+        function remove_backend_server(slb_id, server_id) {
+            let postUrl = "/system/slb_remove_backend_server/" + slb_id + "/" + server_id + "/";
+            // 显示 loading 遮盖层
+            jQuery("#loading").showLoading();
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 刷新页面
+                    location.reload();
+                    // 提示成功信息
+                    $.notify({
+                        title: "移除成功 : ",
+                        message: "从阿里云移除 SLB 后端服务器成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "warning"
+                    });
+                } else {
+                    // 提示失败信息
+                    $.notify({
+                        title: "移除失败 : ",
+                        message: "从阿里云移除 SLB 后端服务器失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    jQuery("#loading").hideLoading();
+                }, 100);
+            });
+        }
+
+        // 添加 slb 后端服务器
+        function add_backend_server(slb_id, server_id) {
+            let postUrl = "/system/slb_add_backend_server/" + slb_id + "/" + server_id + "/";
+            // 显示 loading 遮盖层
+            jQuery("#loading").showLoading();
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 刷新页面
+                    location.reload();
+                    // 提示成功信息
+                    $.notify({
+                        title: "添加成功 : ",
+                        message: "从阿里云添加 SLB 后端服务器成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "success"
+                    });
+                } else {
+                    // 提示失败信息
+                    $.notify({
+                        title: "添加失败 : ",
+                        message: "从阿里云添加 SLB 后端服务器失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    jQuery("#loading").hideLoading();
+                }, 100);
             });
         }
 

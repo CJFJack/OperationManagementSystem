@@ -83,9 +83,9 @@
                                         {{ application.application_race.alias }}
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary"
+                                        <a class="btn btn-outline-primary"
                                            href="{% url 'system:application_change' application.id %}">修改</a>
-                                        <a class="btn btn-danger" id="demoSwal{{ forloop.counter }}" href="#">删除</a>
+                                        <a class="btn btn-outline-danger" id="demoSwal{{ forloop.counter }}" href="#">删除</a>
                                     </td>
                                     <td>
                                         {% if application.status == 'N' %}<span class="text-danger">禁用</span>{% else %}
