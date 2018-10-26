@@ -5,7 +5,7 @@ OMS(Operation Manage System: 运维管理平台)
 [![Python Version](https://img.shields.io/badge/Python--2.7-paasing-green.svg)](https://img.shields.io/badge/Python--2.7-paasing-green.svg)
 [![Django Version](https://img.shields.io/badge/Django--1.11.15-paasing-green.svg)](https://img.shields.io/badge/Django--1.11.15-paasing-green.svg)
 
-> CMS现有功能:
+> OMS现有功能:
 
 - 统计Dashboard
     - 报警统计
@@ -42,7 +42,7 @@ MySQL 配置修改 settings.py:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cms',
+        'NAME': 'oms',
         'USER': 'root',
         'PASSWORD': 'xxxx',
         'HOST': '127.0.0.1',
