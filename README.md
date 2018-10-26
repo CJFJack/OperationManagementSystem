@@ -1,4 +1,4 @@
-CMS(Config Manager System: 运维管理平台)
+OMS(Operation Manage System: 运维管理平台)
 ==============================================
 
 [![Build Status](https://img.shields.io/travis/rust-lang/rust.svg)](https://img.shields.io/travis/rust-lang/rust.svg)
