@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding=utf-8
+# -*- coding: utf-8 -*-
 
 from aliyunsdkcore import client
 from aliyunsdkcms.request.v20180308 import QueryMetricLastRequest

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding=utf-8
+# -*- coding: utf-8 -*-
 
 from aliyunsdkcore import client
 from aliyunsdkrds.request.v20140815 import DescribeDBInstancesRequest
