@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,6 +42,7 @@ INSTALLED_APPS = [
     'OperationManagementSystem.apps.system',
     'OperationManagementSystem.apps.jenkins',
     'OperationManagementSystem.apps.config',
+    'OperationManagementSystem.apps.dashboard',
     'simple_history',
 ]
 
@@ -76,7 +76,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'OperationManagementSystem.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
@@ -90,7 +89,6 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -110,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -122,8 +119,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
-
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
@@ -132,7 +128,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     BASE_DIR + STATIC_URL,
 )
-
 
 # 会话超时时间
 SESSION_COOKIE_AGE = 60 * 30
@@ -145,11 +140,9 @@ CORS_ORIGIN_WHITELIST = (
     '*'
 )
 
-
 # 阿里云API配置
 ACCESS_KEY_ID = 'ZAL5Z3Ee8KhyZ2U1'
 ACCESS_KEY_SECRET = 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe'
-
 
 # 配置文件发布目录
 DEPLOY_DIR_PATH = r'D:\release'

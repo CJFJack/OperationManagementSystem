@@ -2,7 +2,7 @@
 
 from acs_api import acs_alarm_history
 
-from .models import AlarmHistory
+from OperationManagementSystem.apps.alarm.models import AlarmHistory
 import datetime
 import time
 

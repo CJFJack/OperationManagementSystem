@@ -69,7 +69,7 @@
         $.ajax({
             type: "post",
             async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
-            url: "{% url 'alarm:index_alarm_product_type_pie' %}",    //请求发送到TestServlet处
+            url: "{% url 'dashboard:index_alarm_product_type_pie' %}",    //请求发送到TestServlet处
             dataType: "json",        //返回数据形式为json
             success: function (result) {
                 var product_type_list = result['product_type_list']
@@ -123,7 +123,7 @@
         $.ajax({
             type: "post",
             async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
-            url: "{% url 'alarm:index_alarm_metric_type_pie' %}",    //请求发送到TestServlet处
+            url: "{% url 'dashboard:index_alarm_metric_type_pie' %}",    //请求发送到TestServlet处
             dataType: "json",        //返回数据形式为json
             success: function (result) {
                 var metric_type_list = result['metric_type_list']
@@ -177,7 +177,7 @@
         $.ajax({
             type: "post",
             async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
-            url: "{% url 'alarm:index_alarm_instance_pie' %}",    //请求发送到TestServlet处
+            url: "{% url 'dashboard:index_alarm_instance_pie' %}",    //请求发送到TestServlet处
             dataType: "json",        //返回数据形式为json
             success: function (result) {
                 var instance_alarm_list = result['instance_alarm_list']
@@ -232,7 +232,7 @@
         $.ajax({
             type: "post",
             async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
-            url: "{% url 'alarm:index_alarm_line' %}",    //请求发送到TestServlet处
+            url: "{% url 'dashboard:index_alarm_line' %}",    //请求发送到TestServlet处
             dataType: "json",        //返回数据形式为json
             success: function (result) {
                 var alarm_num_x = result['alarm_num_x'];

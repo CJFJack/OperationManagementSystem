@@ -3,6 +3,7 @@
 from django.conf.urls import url
 from . import views
 
+
 app_name = 'system'
 
 urlpatterns = [
@@ -38,4 +39,5 @@ urlpatterns = [
     url(r'^slb_remove_backend_server/(?P<slb_id>[0-9]+)/(?P<server_id>[0-9]+)/$', views.slb_remove_backend_server,
         name='slb_add_backend_server'),
     url(r'^slb_change/(?P<slb_id>[0-9]+)$', views.SLBChangeView.as_view(), name='slb_change'),
+
 ]
