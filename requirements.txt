@@ -5,3 +5,6 @@ aliyun-python-sdk-core
 aliyun-python-sdk-ecs
 aliyun-python-sdk-cms
 aliyun-python-sdk-slb
+aliyun-python-sdk-rds
+APScheduler
+

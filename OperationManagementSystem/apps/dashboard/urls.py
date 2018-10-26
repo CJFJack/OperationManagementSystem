@@ -32,4 +32,16 @@ def get_alarm_history():
     print ("get_alarm_history")
 
 
+@scheduler.scheduled_job("interval", seconds=600, id="get_rds_info")
+def get_rds_info():
+    cron.get_rds_info()
+    print ('Update RDS Info')
+
+
+@scheduler.scheduled_job("interval", seconds=300, id="get_rds_monitor")
+def get_rds_monitor():
+    cron.get_rds_monitor()
+    print ('get_rds_monitor')
+
+
 scheduler.start()
