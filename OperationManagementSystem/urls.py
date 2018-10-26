@@ -17,13 +17,18 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from . import views
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^system/', include('OperationManagementSystem.apps.system.urls')),
     url(r'^config/', include('OperationManagementSystem.apps.config.urls')),
     url(r'^operation/', include('OperationManagementSystem.apps.operation.urls')),
-    url(r'^$', views.index, name='index'),
+    url(r'^alarm/', include('OperationManagementSystem.apps.alarm.urls')),
+    url(r'^$', TemplateView.as_view(template_name='dashboard/alarm.html'), name='index'),
     url(r'^login/', views.LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
 ]
+
+

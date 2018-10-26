@@ -1,0 +1,319 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-dashboard"></i> 报警统计报表</h1>
+            <p> 报警统计饼图（产品类型、监控项、实例项），报警数量折线图</p>
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">仪表盘</li>
+            <li class="breadcrumb-item active"><a href="#">报警-统计报表</a></li>
+        </ul>
+    </div>
+
+    {#        报警统计报表#}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                {#报警统计饼图#}
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div id="alarm_product_type_pie" style="min-height:300px;"></div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div id="alarm_metric_type_pie" style="min-height:300px;"></div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div id="alarm_instance_pie" style="min-height:300px;"></div>
+                    </div>
+                </div>
+                <br><br>
+
+                {# 报警数量折线图#}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="alarm_line" style="min-height:300px;"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+{% block custom_static %}
+
+    {#    引用echarts#}
+    <script src="https://cdn.bootcss.com/echarts/4.1.0/echarts.min.js"></script>
+
+    <!-- Ajax Request-->
+    <script type="text/javascript">
+        {#csrf安全认证机制#}
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+
+        {#产品类型ALARM饼图#}
+        var myChart_ALARM_PRODUCT_TYPE_pie = echarts.init(document.getElementById('alarm_product_type_pie'));
+        jQuery('#alarm_product_type_pie').showLoading();
+        {#显示产品类型ALARM饼图#}
+        $.ajax({
+            type: "post",
+            async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+            url: "{% url 'alarm:index_alarm_product_type_pie' %}",    //请求发送到TestServlet处
+            dataType: "json",        //返回数据形式为json
+            success: function (result) {
+                var product_type_list = result['product_type_list']
+                var product_type_alarm_list = result['product_type_alarm_list']
+                var option = {
+                    title: {
+                        text: '产品类型报警比例',
+                        subtext: '近30天',
+                        x: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}报警数:\n{c}'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: product_type_list
+                    },
+                    series: [
+                        {
+                            name: '',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '60%'],
+                            data: product_type_alarm_list,
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart_ALARM_PRODUCT_TYPE_pie.setOption(option);
+                jQuery('#alarm_product_type_pie').hideLoading();
+            },
+            error: function (errorMsg) {
+                //请求失败时执行该函数
+                jQuery('#alarm_product_type_pie').hideLoading();
+            }
+        });
+
+
+        {#监控项类型ALARM饼图#}
+        var myChart_ALARM_METRIC_TYPE_pie = echarts.init(document.getElementById('alarm_metric_type_pie'));
+        jQuery('#alarm_metric_type_pie').showLoading();
+        {#显示监控项类型ALARM饼图#}
+        $.ajax({
+            type: "post",
+            async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+            url: "{% url 'alarm:index_alarm_metric_type_pie' %}",    //请求发送到TestServlet处
+            dataType: "json",        //返回数据形式为json
+            success: function (result) {
+                var metric_type_list = result['metric_type_list']
+                var metric_type_alarm_list = result['metric_type_alarm_list']
+                var option = {
+                    title: {
+                        text: '监控项报警比例',
+                        subtext: '近30天',
+                        x: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}报警数:\n{c}'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: metric_type_list
+                    },
+                    series: [
+                        {
+                            name: '',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '60%'],
+                            data: metric_type_alarm_list,
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart_ALARM_METRIC_TYPE_pie.setOption(option);
+                jQuery('#alarm_metric_type_pie').hideLoading();
+            },
+            error: function (errorMsg) {
+                //请求失败时执行该函
+                jQuery('#alarm_metric_type_pie').hideLoading();
+            }
+        });
+
+
+        {#实例比例ALARM饼图#}
+        var myChart_ALARM_INSTANCE_pie = echarts.init(document.getElementById('alarm_instance_pie'));
+        jQuery('#alarm_instance_pie').showLoading();
+        {#显示实例比例ALARM饼图#}
+        $.ajax({
+            type: "post",
+            async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+            url: "{% url 'alarm:index_alarm_instance_pie' %}",    //请求发送到TestServlet处
+            dataType: "json",        //返回数据形式为json
+            success: function (result) {
+                var instance_alarm_list = result['instance_alarm_list']
+                var instance_list = result['instance_list']
+                var option = {
+                    title: {
+                        text: '实例报警比例',
+                        subtext: '近30天',
+                        x: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}报警数:\n{c}'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: instance_list
+                    },
+                    series: [
+                        {
+                            name: '',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '60%'],
+                            data: instance_alarm_list,
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart_ALARM_INSTANCE_pie.setOption(option);
+                jQuery('#alarm_instance_pie').hideLoading();
+            },
+            error: function (errorMsg) {
+                //请求失败时执行该函
+                jQuery('#alarm_instance_pie').hideLoading();
+            }
+        });
+
+
+        {#ALARM - line图#}
+        var myChart_ALARM_line = echarts.init(document.getElementById('alarm_line'));
+        {#显示loading加载样式#}
+        jQuery('#alarm_line').showLoading();
+        {#显示RDS - CPU - line图。#}
+        $.ajax({
+            type: "post",
+            async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+            url: "{% url 'alarm:index_alarm_line' %}",    //请求发送到TestServlet处
+            dataType: "json",        //返回数据形式为json
+            success: function (result) {
+                var alarm_num_x = result['alarm_num_x'];
+                var alarm_num_y = result['alarm_num_y'];
+                var option = {
+                    title: {
+                        text: '报警数量趋势（单位：次）',
+                        subtext: '今年内'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross',
+                            label: {
+                                backgroundColor: '#6a7985'
+                            }
+                        },
+                        formatter: '{b}月份报警数量:\n{c}次'
+                    },
+                    legend: {
+                        data: ['报警数量趋势（单位：次）']
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {},
+                            magicType: {
+                                type: ['line', 'bar']
+                            }
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: [
+                        {
+                            type: 'category',
+                            boundaryGap: false,
+                            data: alarm_num_x,
+                            axisLabel: {
+                                interval: 'auto',
+                            }
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value',
+                            axisLabel: {
+                                show: true,
+                                interval: 'auto',
+                                formatter: '{value}'
+                            },
+                            show: true
+                        }
+                    ],
+                    series: [{
+                        data: alarm_num_y,
+                        type: 'bar',
+                        itemStyle: {
+                            normal: {
+                                color: '#0099cc',  //圈圈的颜色
+                                lineStyle: {
+                                    color: '#0099cc'  //线的颜色
+                                }
+                            }
+                        },
+                        areaStyle: {}
+                    }]
+                };
+                myChart_ALARM_line.setOption(option);
+                jQuery('#alarm_line').hideLoading();
+            },
+            error: function (errorMsg) {
+                //请求失败时执行该函
+                jQuery('#alarm_line').hideLoading();
+            }
+        });
+
+
+    </script>
+
+{% endblock %}
