@@ -114,9 +114,9 @@ python manage.py runserver 0:8888
 QQ: 398741302
 
 ![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_login.png)
-![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_alarm_report.png)
-![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_rds_report.png)
-![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_config_manager.png)
-![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_ecs_manager.png)
+![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_alarm_dashboard.png)
+![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_rds_ashboard.png)
+![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_config_manage.png)
+![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_ecs_manage.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_deploy_apply.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_jenkins_job_manage.png)
