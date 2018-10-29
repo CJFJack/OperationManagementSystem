@@ -67,10 +67,10 @@
                                             <p>
                                                 {{ r.ECS.name }}&nbsp;&nbsp;&nbsp;&nbsp;
                                                 {% if r.status == "Y" %}已发布{% else %}
-                                                    <span class="text-danger">待发布</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
-                                                <button type="button" class="btn btn-outline-success"
-                                                        onclick="config_deploy('{{ r.id }}')">发布
-                                                </button>
+                                                    <span class="text-danger">待发布</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <button type="button" class="btn btn-outline-success"
+                                                            onclick="config_deploy('{{ r.id }}')">发布
+                                                    </button>{% endif %}
                                             </p>
                                         {% endfor %}
                                     </td>

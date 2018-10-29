@@ -32,9 +32,26 @@ class ConfigChangeDetailView(generic.DetailView):
 @login_required(login_url='/login/')
 def configfile_change_save(request, configfile_id):
     configfile = Configfile.objects.get(pk=configfile_id)
-    configfile.modified_user = request.user.username
-    configfile.content = request.POST['content']
-    configfile.save()
+    """修改相关配置文件，并更新配置文件发布状态"""
+    if "log" in configfile.filename:
+        """log配置文件处理"""
+        configfile.modified_user = request.user.username
+        configfile.content = request.POST['content']
+        configfile.save()
+        for r in configfile.application.release_set.all():
+            r.status = "N"
+            r.save()
+    else:
+        """非log配置文件处理"""
+        for application_obj in configfile.get_application_race_application_list():
+            for configfile_obj in application_obj.configfile_set.all():
+                if configfile_obj.filename == configfile.filename:
+                    configfile_obj.modified_user = request.user.username
+                    configfile_obj.content = request.POST['content']
+                    configfile_obj.save()
+            for r in application_obj.release_set.all():
+                r.status = "N"
+                r.save()
     return HttpResponseRedirect(reverse('config:configfile'))
 
 
