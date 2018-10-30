@@ -1,0 +1,51 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    {#        表格有数据时展示#}
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> 配置修改详细内容</h1>
+            <p> 查看配置文件修改详细内容</p>
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">配置管理</li>
+            <li class="breadcrumb-item"><a href="{% url 'config:config_history_manage' config_history_detail.id %}">历史记录</a></li>
+            <li class="breadcrumb-item active"><a href="#">详细内容</a></li>
+        </ul>
+    </div>
+
+    {#        表格区域#}
+    <div class="row" id="loading">
+        <div class="col-md-12">
+            <div class="tile">
+                {#                    表格数据区域#}
+                <div class="tile-body table-responsive" id="table">
+                    <table class="table table-hover table-bordered" id="sampleTable"
+                           style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+                        <thead>
+                        <tr>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block custom_static %}
+
+    <!-- Notice-->
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-notify.min.js' %}"></script>
+
+{% endblock %}

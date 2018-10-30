@@ -45,13 +45,16 @@ class ConfigChangeHistory(models.Model):
     history_change_reason = models.CharField(max_length=100, blank=True, null=True)
     history_type = models.CharField(max_length=1)
     history_user = models.ForeignKey('AuthUser', models.DO_NOTHING, blank=True, null=True)
-    site_id = models.IntegerField(blank=True, null=True)
+    application_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'deploy_historicalconfigfile'
+        db_table = 'config_historicalconfigfile'
         verbose_name = u'配置修改历史记录表'
         verbose_name_plural = verbose_name
+
+    def get_application_fullname(self):
+        return Application.objects.get(pk=self.application_id).fullname
 
     def __unicode__(self):
         return self.filename

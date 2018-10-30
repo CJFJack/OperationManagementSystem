@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render, reverse
-from OperationManagementSystem.apps.config.models import Configfile
+from OperationManagementSystem.apps.config.models import Configfile, ConfigChangeHistory
 from OperationManagementSystem.apps.system.models import Application
 
 from django.views import generic
@@ -55,6 +55,16 @@ def configfile_change_save(request, configfile_id):
     return HttpResponseRedirect(reverse('config:configfile'))
 
 
+@login_required(login_url='/login/')
+def config_history_manage(request, configfile_id):
+    config_history_list = ConfigChangeHistory.objects.filter(id=configfile_id).order_by('-modified_user')
+    return render(request, 'config/config_history_manage.html', {'config_history_list': config_history_list})
 
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ConfigHistoryDetailView(generic.DetailView):
+    model = ConfigChangeHistory
+    template_name = 'config/config_history_detail.html'
+    context_object_name = 'config_history_detail'
 
 

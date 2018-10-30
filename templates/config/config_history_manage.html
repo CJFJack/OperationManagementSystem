@@ -1,0 +1,84 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    {#        表格有数据时展示#}
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> 配置修改历史记录</h1>
+            {% if config_history_list %}
+                <p> 查看配置文件修改历史记录列表，可查看详细内容，恢复回滚</p>
+            {% else %}
+                <p>No history is available.</p>
+            {% endif %}
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">配置管理</li>
+            <li class="breadcrumb-item active"><a href="#">历史记录</a></li>
+        </ul>
+    </div>
+
+    {% if config_history_list %}
+        {#        表格区域#}
+        <div class="row" id="loading">
+            <div class="col-md-12">
+                <div class="tile">
+                    {#                    表格数据区域#}
+                    <div class="tile-body table-responsive" id="table">
+                        <table class="table table-hover table-bordered" id="sampleTable"
+                               style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+                            <thead>
+                            <tr>
+                                <th>站点名称</th>
+                                <th>配置文件名</th>
+                                <th>修改人</th>
+                                <th>修改时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for ch in config_history_list %}
+                                <tr>
+                                    <td>{{ ch.get_application_fullname }}</td>
+                                    <td>{{ ch.filename }}</td>
+                                    <td>{{ ch.modified_user }}</td>
+                                    <td>{{ ch.modified_time|date:"Y-m-d H:i:s" }}</td>
+                                    <td>
+                                        <a class="btn btn-outline-warning" href="">&nbsp;恢复&nbsp;</a>
+                                        <a class="btn btn-outline-info" href="{% url 'config:config_history_detail' ch.history_id %}">&nbsp;查看内容&nbsp;</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body">还没有修改记录</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block custom_static %}
+
+    <!-- Data table plugin-->
+    <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
+    <script type="text/javascript">$('#sampleTable').DataTable();</script>
+
+    <!-- Notice-->
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-notify.min.js' %}"></script>
+
+{% endblock %}
