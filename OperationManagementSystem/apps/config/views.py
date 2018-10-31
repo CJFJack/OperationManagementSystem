@@ -8,7 +8,10 @@ from OperationManagementSystem.apps.system.models import Application
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
+import json
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -57,7 +60,7 @@ def configfile_change_save(request, configfile_id):
 
 @login_required(login_url='/login/')
 def config_history_manage(request, configfile_id):
-    config_history_list = ConfigChangeHistory.objects.filter(id=configfile_id).order_by('-modified_user')
+    config_history_list = ConfigChangeHistory.objects.filter(id=configfile_id).order_by('-modified_time')
     return render(request, 'config/config_history_manage.html', {'config_history_list': config_history_list})
 
 
@@ -67,4 +70,16 @@ class ConfigHistoryDetailView(generic.DetailView):
     template_name = 'config/config_history_detail.html'
     context_object_name = 'config_history_detail'
 
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def config_recover(request, history_id):
+    config_history_obj = ConfigChangeHistory.objects.get(pk=history_id)
+    config_obj = Configfile.objects.get(pk=config_history_obj.id)
+    config_obj.content = config_history_obj.content
+    config_obj.save()
+    for r in config_obj.application.release_set.all():
+        r.status = "N"
+        r.save()
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 

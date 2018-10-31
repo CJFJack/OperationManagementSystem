@@ -17,7 +17,7 @@
         {#            面包屑区域#}
         <ul class="app-breadcrumb breadcrumb side">
             <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
-            <li class="breadcrumb-item">配置管理</li>
+            <li class="breadcrumb-item"><a href="{% url 'config:configfile' %}">配置管理</a></li>
             <li class="breadcrumb-item active"><a href="#">历史记录</a></li>
         </ul>
     </div>
@@ -33,7 +33,7 @@
                                style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
                             <thead>
                             <tr>
-                                <th>站点名称</th>
+                                <th>应用名称</th>
                                 <th>配置文件名</th>
                                 <th>修改人</th>
                                 <th>修改时间</th>
@@ -48,8 +48,10 @@
                                     <td>{{ ch.modified_user }}</td>
                                     <td>{{ ch.modified_time|date:"Y-m-d H:i:s" }}</td>
                                     <td>
-                                        <a class="btn btn-outline-warning" href="">&nbsp;恢复&nbsp;</a>
-                                        <a class="btn btn-outline-info" href="{% url 'config:config_history_detail' ch.history_id %}">&nbsp;查看内容&nbsp;</a>
+                                        <button class="btn btn-outline-warning" type="submit" name="config_recover"
+                                                onclick="config_recover('{{ ch.history_id }}')">恢复
+                                        </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-outline-info"
+                                                                      href="{% url 'config:config_history_detail' ch.history_id %}">查看内容</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -80,5 +82,44 @@
 
     <!-- Notice-->
     <script type="text/javascript" src="{% static 'js/plugins/bootstrap-notify.min.js' %}"></script>
+
+    <!-- function-->
+    <script>
+
+        // 同步所有ECS
+        function config_recover(history_id) {
+            let postUrl = "/config/config_recover/" + history_id + "/";
+            // 显示 loading 遮盖层
+            jQuery('#loading').showLoading();
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 提示成功信息
+                    $.notify({
+                        title: "",
+                        message: "回滚成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "success"
+                    });
+                }
+                else {
+                    // 提示失败信息
+                    $.notify({
+                        title: "",
+                        message: "回滚失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    jQuery('#loading').hideLoading();
+                }, 300);
+            });
+        };
+
+    </script>
 
 {% endblock %}

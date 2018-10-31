@@ -8,13 +8,14 @@
         {#            页面简介区域#}
         <div>
             <h1><i class="fa fa-th-list"></i> 配置修改详细内容</h1>
-            <p> 查看配置文件修改详细内容</p>
+            <p> 查看配置文件修改详细内容，可操作回滚</p>
         </div>
         {#            面包屑区域#}
         <ul class="app-breadcrumb breadcrumb side">
             <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
-            <li class="breadcrumb-item">配置管理</li>
-            <li class="breadcrumb-item"><a href="{% url 'config:config_history_manage' config_history_detail.id %}">历史记录</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'config:configfile' %}">配置管理</a></li>
+            <li class="breadcrumb-item"><a
+                    href="{% url 'config:config_history_manage' config_history_detail.id %}">历史记录</a></li>
             <li class="breadcrumb-item active"><a href="#">详细内容</a></li>
         </ul>
     </div>
@@ -23,19 +24,33 @@
     <div class="row" id="loading">
         <div class="col-md-12">
             <div class="tile">
-                {#                    表格数据区域#}
-                <div class="tile-body table-responsive" id="table">
-                    <table class="table table-hover table-bordered" id="sampleTable"
-                           style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
-                        <thead>
-                        <tr>
-
-                        </tr>
-                        </thead>
-                        <tbody>
-
-                        </tbody>
-                    </table>
+                <div class="tile-body" id="table">
+                    <div class="form-group row">
+                        <label class="control-label col-md-2">应用名</label>
+                        <div class="col-md-5">
+                            {{ config_history_detail.get_application_fullname }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-2">配置文件名</label>
+                        <div class="col-md-5">
+                            {{ config_history_detail.filename }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-2">配置内容</label>
+                        <div class="col-md-5">
+                            <textarea rows="30" cols="110" readonly>{{ config_history_detail.content }}</textarea>
+                        </div>
+                    </div>
+                    <div class="tile-footer">
+                        <button class="btn btn-primary" type="submit" name="config_recover"
+                                onclick="config_recover('{{ config_history_detail.history_id }}')"><i
+                                class="fa fa-fw fa-lg fa-check-circle"></i>恢复
+                        </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-secondary"
+                                                      href="{% url 'config:config_history_manage' config_history_detail.id %}"><i
+                            class="fa fa-fw fa-lg fa-times-circle"></i>返回</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -47,5 +62,44 @@
 
     <!-- Notice-->
     <script type="text/javascript" src="{% static 'js/plugins/bootstrap-notify.min.js' %}"></script>
+
+    <!-- function-->
+    <script>
+
+        // 同步所有ECS
+        function config_recover(history_id) {
+            let postUrl = "/config/config_recover/" + history_id + "/";
+            // 显示 loading 遮盖层
+            jQuery('#loading').showLoading();
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 提示成功信息
+                    $.notify({
+                        title: "",
+                        message: "回滚成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "success"
+                    });
+                }
+                else {
+                    // 提示失败信息
+                    $.notify({
+                        title: "",
+                        message: "回滚失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    jQuery('#loading').hideLoading();
+                }, 300);
+            });
+        };
+
+    </script>
 
 {% endblock %}
