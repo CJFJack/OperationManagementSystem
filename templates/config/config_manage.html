@@ -99,7 +99,7 @@
                                         {% endfor %}
                                     </td>
                                     <td><a class="btn btn-outline-info" href="javascript:void(0);"
-                                           onclick="MoreHealthRefresh('{{ site.id }}', '{{ site.fullname }}')">刷新</a>
+                                           onclick="update_one_ecs_health_info({{ application.slbtoapplication_set.all.0.SLB_id }})">刷新</a>
                                     </td>
                                     <td>
                                         {% for config in application.configfile_set.all %}
@@ -247,6 +247,41 @@
                     // 延迟300毫秒关闭loading遮盖层
                     jQuery("#loading").hideLoading();
                 }, 100);
+            });
+        }
+
+        // 刷新单个SLB健康信息
+        function update_one_ecs_health_info(slb_id, server_id) {
+            let postUrl = "/system/one_slb_health_update/" + slb_id + "/";
+            // 显示 loading 遮盖层
+            jQuery("#loading").showLoading();
+            // 发送 post 请求
+            $.post(postUrl, function (data) {
+                if (data.success) {
+                    // 刷新页面
+                    location.reload();
+                    // 提示成功信息
+                    $.notify({
+                        title: "刷新成功 : ",
+                        message: "从阿里云刷新 SLB 基础信息成功！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "info"
+                    });
+                } else {
+                    // 提示失败信息
+                    $.notify({
+                        title: "刷新失败 : ",
+                        message: "从阿里云刷新 SLB 基础信息失败！",
+                        icon: 'fa fa-check'
+                    }, {
+                        type: "danger"
+                    });
+                }
+                setTimeout(function () {
+                    // 延迟300毫秒关闭loading遮盖层
+                    jQuery("#loading").hideLoading();
+                }, 300);
             });
         }
 
