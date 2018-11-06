@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^operation/', include('OperationManagementSystem.apps.operation.urls')),
     url(r'^alarm/', include('OperationManagementSystem.apps.alarm.urls')),
     url(r'^dashboard/', include('OperationManagementSystem.apps.dashboard.urls')),
+    url(r'^deploy/', include('OperationManagementSystem.apps.deploy.urls')),
     url(r'^$', alarm_charts, name='index'),
     url(r'^login/', views.LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),

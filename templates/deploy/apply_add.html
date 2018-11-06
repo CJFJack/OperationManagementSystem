@@ -1,0 +1,155 @@
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-th-list"></i> 填写发布申请单</h1>
+            <p> 填写发布申请单，包括期望发布日期，发布涉及应用等</p>
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">发布申请管理</li>
+            <li class="breadcrumb-item active">填写发布申请单</li>
+        </ul>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <form class="form-horizontal" action="{% url 'deploy:apply_add' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">申请项目名称</label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="text" name="apply_project" placeholder="请输入项目名称">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">期望发布日期</label>
+                            <div class="col-md-5">
+                                <input class="form-control" id="demoDate" name="wish_deploy_time" type="text"
+                                       placeholder="选择期望发布日期">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">配置修改说明</label>
+                            <div class="col-md-5">
+                                <textarea class="form-control" rows="10" type="text" name="conf_amend_explain"
+                                          placeholder="请输入配置修改说明"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">备注事项</label>
+                            <div class="col-md-5">
+                                <textarea class="form-control" rows="10" type="text" name="remark_explain"
+                                          placeholder="请输入备注事项"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">添加发布应用</label>
+                            <div class="col-md-9">
+                                <table class="table table-hover table-bordered">
+                                    <thead>
+                                    <tr>
+                                        {% for form in deploy_item_formset %}
+                                            {% if forloop.first %}
+                                                {% for field in form %}
+                                                    {% if field.label != "Id" and field.label != "所属发布申请单" %}
+                                                        <th>{{ field.label }}</th>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                    </thead>
+                                    <tbody id="id-deployitem-tbody">
+                                    </tbody>
+                                    <tfoot>
+                                    <tr class="add-row">
+                                        <td colspan="9"><a href="#" class="add-item">添加另一个 发布站点</a></td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit" name="application_add"><i
+                                    class="fa fa-fw fa-lg fa-check-circle"></i>创建
+                            </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-secondary"
+                                                          href="{% url 'deploy:apply_manage' %}"><i
+                                class="fa fa-fw fa-lg fa-times-circle"></i>返回</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block custom_static %}
+
+    <!-- Page specific javascripts-->
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-datepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/select2.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/bootstrap-datepicker.min.js' %}"></script>
+    <script type="text/javascript">
+        $('#sl').click(function () {
+            $('#tl').loadingBtn();
+            $('#tb').loadingBtn({text: "Signing In"});
+        });
+
+        $('#el').click(function () {
+            $('#tl').loadingBtnComplete();
+            $('#tb').loadingBtnComplete({html: "Sign In"});
+        });
+
+        $('#demoDate').datepicker({
+            format: "dd/mm/yyyy",
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        $('#demoSelect').select2();
+
+    </script>
+
+    <script type="text/html" id="item-template">
+        <tr id="deployitem-set-__prefix__">
+            <td>{{ deploy_item_formset.empty_form.deploy_order_by }}</td>
+            <td>{{ deploy_item_formset.empty_form.jenkins_version }}</td>
+            <td>{{ deploy_item_formset.empty_form.deploy_application }}</td>
+            <td>{{ deploy_item_formset.empty_form.type }}</td>
+            <td>{{ deploy_item_formset.empty_form.DELETE }}</td>
+            <td style="display: none">{{ deployitem_form.empty_form.id }}</td>
+        </tr>
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.add-item').click(function (ev) {
+                ev.preventDefault();
+                var count = $('#id-deployitem-tbody').children().length;
+                var tmplMarkup = $('#item-template').html();
+                var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+                $('tbody#id-deployitem-tbody').append(compiledTmpl);
+
+                //update form count
+                $('#id_item_items-TOTAL_FORMS').attr('value', count + 1);
+
+                // some animate to scroll to view our new form
+                //  $('html, body').animate({
+                //          scrollTop: $("#add-item-button").position().top-200
+                //      }, 800);
+            });
+        });
+    </script>
+
+{% endblock %}

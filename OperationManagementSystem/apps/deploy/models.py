@@ -26,7 +26,7 @@ class DeployApply(models.Model):
         (TESTMANAGERAPPROVAL, '测试经理审批中'),
         (TECHNICALDIRECTORYAPPROVAL, '技术总监审批中'),
     )
-    apply_name = models.CharField("申请编号", max_length=50)
+    apply_project = models.CharField("申请编号", max_length=50)
     status = models.CharField(
         "申请状态",
         max_length=3,
@@ -68,3 +68,4 @@ class DeployApplyOperateLog(models.Model):
 
     def __unicode__(self):
         return self.operator_name
+
