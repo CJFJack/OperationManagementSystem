@@ -30,6 +30,8 @@ OMS(Operation Manage System: 运维管理平台)
 ### 安装依赖
 
 ```
+yum install gcc libffi-devel python-devel openssl-devel mysql-devel -y
+
 pip install -r requirements.txt
 ```
 

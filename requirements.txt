@@ -1,5 +1,6 @@
 django
 django-simple-history
+mysqlclient
 aliyuncli
 aliyun-python-sdk-core
 aliyun-python-sdk-ecs
