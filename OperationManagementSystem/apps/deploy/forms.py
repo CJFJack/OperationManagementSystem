@@ -1,7 +1,7 @@
 from django.forms.models import inlineformset_factory
 from OperationManagementSystem.apps.deploy.models import DeployApply
 from OperationManagementSystem.apps.operation.models import DeployItem
-from django.forms import ModelForm, CharField
+from django.forms import ModelForm
 
 
 class DeployApplyForm(ModelForm):

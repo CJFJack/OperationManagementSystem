@@ -7,5 +7,5 @@ app_name = 'deploy'
 
 urlpatterns = [
     url(r'^apply_manage/$', views.DeployApplyListView.as_view(), name='apply_manage'),
-    url(r'^apply_add/$', views.DeployApplyAddView.as_view(), name='apply_add'),
+    url(r'^apply_add/$', views.DeployApplyAdd.as_view(), name='apply_add'),
 ]
