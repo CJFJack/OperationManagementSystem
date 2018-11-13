@@ -21,14 +21,14 @@
         <div class="col-md-12">
             <div class="tile">
                 <div class="tile-body">
-                    <form class="form-horizontal" action="{% url 'deploy:apply_add' %}" method="post">
+                    <form class="form-horizontal" action="{% url 'deploy:apply_create' %}" method="post">
                         {% csrf_token %}
-                        {{ form.management_form }}
+                        {{ deploy_apply_form.management_form }}
                         {{ deploy_item_form.management_form }}
                         <div class="form-group row">
                             <label class="control-label col-md-2">申请项目名称</label>
                             <div class="col-md-5">
-                                <input class="form-control {% if form.errors %}is-invalid{% endif %}"
+                                <input class="form-control {% if deploy_apply_form.errors.apply_project %}is-invalid{% endif %}"
                                        type="text" name="apply_project" placeholder="请输入项目名称">
                             </div>
                         </div>
@@ -53,7 +53,6 @@
                                           placeholder="请输入备注事项"></textarea>
                             </div>
                         </div>
-
                         <div class="form-group row">
                             <label class="control-label col-md-2">添加发布应用</label>
                             <div class="col-md-9">
@@ -81,9 +80,8 @@
                                 </table>
                             </div>
                         </div>
-
                         <div class="tile-footer">
-                            <button class="btn btn-primary" type="submit" name="application_add"><i
+                            <button class="btn btn-primary" type="submit" name="deploy_apply_create"><i
                                     class="fa fa-fw fa-lg fa-check-circle"></i>创建
                             </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-secondary"
                                                           href="{% url 'deploy:apply_manage' %}"><i
