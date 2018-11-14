@@ -6,14 +6,14 @@
     <div class="app-title">
         {#            页面简介区域#}
         <div>
-            <h1><i class="fa fa-th-list"></i> 填写发布申请单</h1>
-            <p> 填写发布申请单，包括期望发布日期，发布涉及应用等</p>
+            <h1><i class="fa fa-th-list"></i> 修改发布申请单</h1>
+            <p> 修改发布申请单，修改发布应用，保存并提交审核</p>
         </div>
         {#            面包屑区域#}
         <ul class="app-breadcrumb breadcrumb side">
             <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
             <li class="breadcrumb-item"><a href="{% url 'deploy:apply_manage' %}">发布申请管理</a></li>
-            <li class="breadcrumb-item active"><a href="#">填写发布申请单</a></li>
+            <li class="breadcrumb-item active"><a href="#">修改发布申请单</a></li>
         </ul>
     </div>
 
@@ -29,7 +29,7 @@
                             <label class="control-label col-md-2">申请项目名称</label>
                             <div class="col-md-5">
                                 <input class="form-control {% if deploy_apply_form.errors.apply_project %}is-invalid{% endif %}"
-                                       type="text" name="apply_project" placeholder="请输入项目名称">
+                                       type="text" name="apply_project" value="{{ deploy_apply_form.instance.apply_project }}" placeholder="请输入项目名称">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -81,8 +81,8 @@
                             </div>
                         </div>
                         <div class="tile-footer">
-                            <button class="btn btn-primary" type="submit" name="deploy_apply_create"><i
-                                    class="fa fa-fw fa-lg fa-check-circle"></i>创建
+                            <button class="btn btn-primary" type="submit" name="deploy_apply_save"><i
+                                    class="fa fa-fw fa-lg fa-check-circle"></i>保存
                             </button>&nbsp;&nbsp;&nbsp;<a class="btn btn-secondary"
                                                           href="{% url 'deploy:apply_manage' %}"><i
                                 class="fa fa-fw fa-lg fa-times-circle"></i>返回</a>

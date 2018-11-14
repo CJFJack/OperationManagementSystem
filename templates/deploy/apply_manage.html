@@ -52,7 +52,7 @@
                             {% for apply in apply_manage %}
                                 <tr>
                                     <td>
-                                        <a href="">{{ apply.apply_project }}</a>
+                                        <a href="{% url 'deploy:apply_update' apply.id %}">{{ apply.apply_project }}</a>
                                     </td>
                                     <td>
                                         {% if apply.status == "WC" %}
@@ -103,7 +103,7 @@
                                         <!--修改按钮-->
                                         {% if apply.status == "WC" %}
                                             <a class="btn btn-success"
-                                               href="">修改</a>
+                                               href="{% url 'deploy:apply_update' apply.id %}">修改</a>
                                         {% endif %}
                                         <!--审核按钮-->
                                         {% if apply.status == "DA" %}
