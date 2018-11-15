@@ -12,4 +12,4 @@ class DeployApplyForm(ModelForm):
 
 DeployItemFormSet = inlineformset_factory(DeployApply, DeployItem, fields=('deploy_order_by', 'jenkins_version',
                                                                            'deploy_application', 'type'), extra=1,
-                                          can_delete=True, min_num=0)
+                                          can_delete=True)

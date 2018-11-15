@@ -51,7 +51,6 @@ class DeployApplyCreateView(generic.CreateView):
 
     def post(self, request, *args, **kwargs):
         self.object = None
-
         form_class = self.get_form_class()
         deploy_apply_form = self.get_form(form_class)
         if request.POST['wish_deploy_time']:
@@ -66,6 +65,7 @@ class DeployApplyCreateView(generic.CreateView):
             else:
                 return self.form_invalid(deploy_apply_form, deploy_item_formset)
         else:
+            pass
             
 
     def form_valid(self, request, deploy_apply_form, deploy_item_formset):
