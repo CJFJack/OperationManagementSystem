@@ -51,21 +51,24 @@ class DeployApplyCreateView(generic.CreateView):
 
     def post(self, request, *args, **kwargs):
         self.object = None
+
         form_class = self.get_form_class()
         deploy_apply_form = self.get_form(form_class)
+        if request.POST['wish_deploy_time']:
+            wish_deploy_date = datetime.strptime(str(request.POST['wish_deploy_time']), "%d/%m/%Y").strftime("%Y-%m-%d")
+            deploy_apply_form.instance.wish_deploy_time = wish_deploy_date
         deploy_apply_form.instance.apply_user = request.user.username
         deploy_item_formset = DeployItemFormSet(self.request.POST)
-        if (deploy_apply_form.is_valid()
-                and deploy_item_formset.is_valid()):
-            return self.form_valid(request, deploy_apply_form, deploy_item_formset)
+        if deploy_item_formset:
+            if (deploy_apply_form.is_valid()
+                    and deploy_item_formset.is_valid()):
+                return self.form_valid(request, deploy_apply_form, deploy_item_formset)
+            else:
+                return self.form_invalid(deploy_apply_form, deploy_item_formset)
         else:
-            return self.form_invalid(deploy_apply_form, deploy_item_formset)
+            
 
     def form_valid(self, request, deploy_apply_form, deploy_item_formset):
-        wish_deploy = deploy_apply_form.instance.wish_deploy_time
-        if wish_deploy is not None:
-            wish_deploy_date = datetime.strptime(str(wish_deploy), "%Y-%d-%m").strftime("%Y-%m-%d")
-            deploy_apply_form.instance.wish_deploy_time = wish_deploy_date
         self.object = deploy_apply_form.save()
         deploy_item_formset.instance = self.object
         deploy_item_formset.save()
