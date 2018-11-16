@@ -65,8 +65,8 @@ class DeployApplyCreateView(generic.CreateView):
             else:
                 return self.form_invalid(deploy_apply_form, deploy_item_formset)
         else:
-            pass
-            
+            if deploy_apply_form.is_valid():
+                return self.form_valid(request, deploy_apply_form, '')
 
     def form_valid(self, request, deploy_apply_form, deploy_item_formset):
         self.object = deploy_apply_form.save()
