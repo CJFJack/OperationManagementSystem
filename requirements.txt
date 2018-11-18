@@ -1,5 +1,6 @@
 django
 django-simple-history
+MySQL-python
 mysqlclient
 aliyuncli
 aliyun-python-sdk-core
@@ -8,4 +9,5 @@ aliyun-python-sdk-cms
 aliyun-python-sdk-slb
 aliyun-python-sdk-rds
 APScheduler
+
 
