@@ -137,9 +137,12 @@ class ApplicationListView(generic.ListView):
 
 @login_required(login_url='/login/')
 def application_delete(request, application_id):
-    application = Application.objects.get(pk=application_id)
-    application.delete()
-    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+    if request.user.has_perm('system.application_delete'):
+        application = Application.objects.get(pk=application_id)
+        application.delete()
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+    else:
+        return HttpResponse(json.dumps({'success': False, 'message': '没有删除权限'}), content_type='application/json')
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')

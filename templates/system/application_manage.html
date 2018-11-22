@@ -143,6 +143,9 @@
                                 swal("Deleted!", "Your imaginary file has been deleted.", "success");
                                 location.reload();
                             }
+                            else {
+                                alert(data.message);
+                            }
                         })
                     } else {
                         swal("Cancelled", "Your imaginary file is safe :)", "error");
