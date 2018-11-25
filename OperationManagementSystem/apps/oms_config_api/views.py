@@ -7,6 +7,7 @@ from rest_framework import authentication, permissions
 from django.contrib.auth.models import User
 
 
+# API example
 class ListUsers(APIView):
     """
     View to list all users in the system.
