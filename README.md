@@ -19,6 +19,7 @@ OMS(Operation Manage System: 运维管理平台)
 - 配置管理
     - 配置修改
     - 配置分发
+        - 支持分布式站点接收
     - 配置回滚
 - 发布管理
     - Jenkins管理
