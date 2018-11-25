@@ -5,4 +5,4 @@ from django.apps import AppConfig
 
 
 class ApiConfig(AppConfig):
-    name = 'OperationManagementSystem.apps.api'
+    name = 'OperationManagementSystem.apps.oms_config_api'

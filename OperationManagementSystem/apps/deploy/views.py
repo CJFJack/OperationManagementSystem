@@ -5,7 +5,7 @@ from django.shortcuts import render, reverse
 from OperationManagementSystem.apps.deploy.models import DeployApply
 from OperationManagementSystem.apps.deploy.forms import DeployApplyForm, DeployItemFormSet
 from OperationManagementSystem.apps.operation.models import DeployECS
-from django.views import generic, View
+from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseRedirect, HttpResponse
