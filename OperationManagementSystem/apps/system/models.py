@@ -161,3 +161,4 @@ class RDSUsageRecord(models.Model):
 
     def __unicode__(self):
         return str(self.add_time)
+
