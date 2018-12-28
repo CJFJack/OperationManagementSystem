@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'simple_history',
     'rest_framework',
     'rest_framework.authtoken',
+    'OperationManagementSystem.apps.oms_config_api',
 ]
 
 MIDDLEWARE = [

@@ -9,6 +9,7 @@ from OperationManagementSystem.apps.operation.models import Release
 from django.conf import settings
 from django.core.files import File
 from django.http import HttpResponse
+from .models import ConfigFileReceiveRecord
 import json
 import os
 import logging
@@ -121,6 +122,8 @@ class DeployConfig(APIView):
                     with open(file_name, 'w') as f:
                         config_file = File(f)
                         config_file.write(str(c.content))
+                    """更新接收配件文件记录表"""
+                    ConfigFileReceiveRecord.objects.create(filename=c.filename, application=c.application.fullname, ECS=ecs)
                 else:
                     return HttpResponse(json.dumps({'success': False}), content_type="application/json")
             """更新Release表信息"""
