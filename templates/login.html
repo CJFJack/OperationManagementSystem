@@ -21,7 +21,7 @@
         <h1>OMS</h1>
     </div>
     <div class="login-box">
-        <form class="login-form" action="{% url 'login' %}", method="POST">
+        <form class="login-form" action="{% url 'login' %}" method="POST">
             {% csrf_token %}
             <h3 class="login-head"><i class="fa fa-lg fa-fw fa-user"></i>登录</h3>
             <div class="form-group">

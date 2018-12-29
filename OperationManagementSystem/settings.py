@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'OperationManagementSystem.apps.oms_config_api',
+    'OperationManagementSystem.apps.mychannels',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -119,6 +121,13 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         'rest_framework.permissions.IsAuthenticated',
     )
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "OperationManagementSystem.apps.mychannels.routing.channel_routing",
+    },
 }
 
 # Internationalization

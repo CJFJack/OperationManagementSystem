@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^dashboard/', include('OperationManagementSystem.apps.dashboard.urls')),
     url(r'^deploy/', include('OperationManagementSystem.apps.deploy.urls')),
     url(r'^oms_config_api/', include('OperationManagementSystem.apps.oms_config_api.urls')),
+    url(r'^mychannels/', include('OperationManagementSystem.apps.mychannels.urls')),
     url(r'^$', alarm_charts, name='index'),
     url(r'^login/', views.LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),

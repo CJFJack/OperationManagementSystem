@@ -11,5 +11,6 @@ aliyun-python-sdk-rds
 APScheduler
 djangorestframework
 requests
+channels
 
 

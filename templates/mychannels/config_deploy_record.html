@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    socket = new WebSocket("ws://" + window.location.host + "/mychannels/");
+    socket.onmessage = function (e) {
+        alert(e.data);
+    };
+    socket.onopen = function () {
+        socket.send("hello world");
+    };
+    // Call onopen directly if socket is already open
+    if (socket.readyState == WebSocket.OPEN) socket.onopen();
+</script>
+</body>
+</html>
