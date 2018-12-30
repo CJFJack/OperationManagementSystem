@@ -10,6 +10,8 @@ from django.conf import settings
 from django.core.files import File
 from django.http import HttpResponse
 from .models import ConfigFileReceiveRecord
+from channels import Channel
+from datetime import datetime
 import json
 import os
 import logging
@@ -104,8 +106,6 @@ class DeployConfig(APIView):
 
     def post(self, request, format=None):
         try:
-            p_data = request.POST
-            print p_data
             release_id = request.POST['release_id']
             """实例化"""
             r = Release.objects.get(pk=release_id)
@@ -124,6 +124,10 @@ class DeployConfig(APIView):
                         config_file.write(str(c.content))
                     """更新接收配件文件记录表"""
                     ConfigFileReceiveRecord.objects.create(filename=c.filename, application=c.application.fullname, ECS=ecs)
+                    """发送websocket信息"""
+                    msg = {'group': 'chat', 'deploy_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'ECS': ecs,
+                           'application': c.application.fullname, 'filename': c.filename}
+                    Channel("ws_message").send(msg)
                 else:
                     return HttpResponse(json.dumps({'success': False}), content_type="application/json")
             """更新Release表信息"""

@@ -1,20 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<script>
-    socket = new WebSocket("ws://" + window.location.host + "/mychannels/");
-    socket.onmessage = function (e) {
-        alert(e.data);
-    };
-    socket.onopen = function () {
-        socket.send("hello world");
-    };
-    // Call onopen directly if socket is already open
-    if (socket.readyState == WebSocket.OPEN) socket.onopen();
-</script>
-</body>
-</html>
+{% extends '__base__.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    {#    页面头部#}
+    <div class="app-title">
+        {#            页面简介区域#}
+        <div>
+            <h1><i class="fa fa-edit"></i> 发布实时日志</h1>
+            <p> 配置发布、应用发布的实时日志</p>
+        </div>
+        {#            面包屑区域#}
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+            <li class="breadcrumb-item">发布管理</li>
+            <li class="breadcrumb-item active"><a href="#">发布实时日志</a></li>
+        </ul>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <textarea class="form-control" rows="20" id="chat" readonly></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_static %}
+    <script>
+        function init_ws() {
+            socket = new WebSocket("ws://" + window.location.host + "/mychannels/");
+            socket.onmessage = function (e) {
+                var data = $.parseJSON(e.data);
+                var chat = $("#chat").val()+'\n';
+                var display_info = data['deploy_time']+'  ECS：'+data['ECS']+'  应用：'+data['application']+'  发布配置文件：'+data['filename']+'  成功！';
+                $("#chat").val(chat+display_info);
+            };
+            socket.onopen = function () {
+                socket.send("start ws connection");
+            };
+            if (socket.readyState == WebSocket.OPEN) socket.onopen();
+        }
+
+        $(document).ready(function () {
+            init_ws()
+        })
+    </script>
+{% endblock %}

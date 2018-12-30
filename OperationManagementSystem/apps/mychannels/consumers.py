@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from channels import Group
+import json
 
 # Connected to websocket.connect
 def ws_add(message):
@@ -10,8 +11,9 @@ def ws_add(message):
 
 # Connected to websocket.receive
 def ws_message(message):
-    Group("chat").send({
-        "text": "[user] %s" % message.content['text'],
+    group_name = message.content['group']
+    Group(group_name).send({
+        "text": json.dumps(message.content),
     })
 
 # Connected to websocket.disconnect
