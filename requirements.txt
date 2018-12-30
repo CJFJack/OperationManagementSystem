@@ -12,5 +12,6 @@ APScheduler
 djangorestframework
 requests
 channels
+jenkinsapi
 
 
