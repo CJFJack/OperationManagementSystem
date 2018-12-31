@@ -80,7 +80,7 @@
                 class="treeview-indicator fa fa-angle-right"></i></a>
             <ul class="treeview-menu">
                 <li><a class="treeview-item" href="{% url 'deploy:apply_manage' %}"><i class="icon fa fa-circle-o"></i> 发布申请管理</a></li>
-                <li><a class="treeview-item" href=""><i class="icon fa fa-circle-o"></i> Jenkins任务管理</a></li>
+                <li><a class="treeview-item" href="{% url 'jenkins:jenkins_job_list' %}"><i class="icon fa fa-circle-o"></i> Jenkins任务管理</a></li>
                 <li><a class="treeview-item" href="{% url 'mychannels:config_deploy_record' %}"><i class="icon fa fa-circle-o"></i> 发布实时日志</a></li>
             </ul>
         </li>

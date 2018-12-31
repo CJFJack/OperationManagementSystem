@@ -16,7 +16,7 @@ jenkins = Jenkins(jenkins_url, username=username, password=password,
                       password=password,
                   ))
 
-params = {'min': 1}
+params = {'min': 'k'}
 
 # This will start the job in non-blocking manner
 # jenkins.build_job('test-job', params)
@@ -33,4 +33,5 @@ if qi.is_queued() or qi.is_running():
 
 build = qi.get_build()
 print build
+print build.get_console()
 print build._data['result']
