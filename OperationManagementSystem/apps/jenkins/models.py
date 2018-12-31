@@ -19,13 +19,13 @@ class JenkinsJobList(models.Model):
             return ''
 
     def get_last_success_build_time(self):
-        if self.jenkinsbuildhistory_set.all():
+        if self.jenkinsbuildhistory_set.filter(result=1):
             return self.jenkinsbuildhistory_set.filter(result=1).order_by('-id')[0].build_finish_time.strftime("%Y-%m-%d %H:%M:%S")
         else:
             return ''
 
     def get_last_failure_build_time(self):
-        if self.jenkinsbuildhistory_set.all():
+        if self.jenkinsbuildhistory_set.filter(result=0):
             return self.jenkinsbuildhistory_set.filter(result=0).order_by('-id')[0].build_finish_time.strftime("%Y-%m-%d %H:%M:%S")
         else:
             return ''

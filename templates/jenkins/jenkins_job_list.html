@@ -61,7 +61,7 @@
                             {% for job in jenkins_list %}
                                 <tr>
                                     <td>
-                                        {% if job.result == 1 %}
+                                        {% if job.get_last_build_result == '成功' %}
                                             <span class="text-success">{{ job.get_last_build_result }}</span>
                                         {% else %}<span class="text-danger">{{ job.get_last_build_result }}</span>
                                         {% endif %}

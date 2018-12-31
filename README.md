@@ -125,5 +125,5 @@ QQ: 398741302
 ![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_config_manage.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_ecs_manage.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_slb_manage.png)
-![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_deploy_apply.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_jenkins_job_manage.png)
+![cms](https://raw.githubusercontent.com/CJFJack/OperationManagementSystem/master/doc/images/oms_deploy_apply.png)
