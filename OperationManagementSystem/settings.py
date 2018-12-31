@@ -123,6 +123,10 @@ REST_FRAMEWORK = {
     )
 }
 
+REDIS_URL = 'redis://192.168.88.120:6379/0'
+REDIS_HOST = '192.168.88.120'
+REDIS_PORT = 6379
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgiref.inmemory.ChannelLayer",
