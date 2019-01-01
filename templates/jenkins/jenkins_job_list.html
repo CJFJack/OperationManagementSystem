@@ -62,13 +62,19 @@
                                 <tr>
                                     <td>
                                         {% if job.get_last_build_result == '成功' %}
-                                            <span class="text-success">{{ job.get_last_build_result }}</span>
-                                        {% else %}<span class="text-danger">{{ job.get_last_build_result }}</span>
+                                            <span class="text-success"
+                                                  id="result-{{ job.id }}">{{ job.get_last_build_result }}</span>
+                                        {% else %}<span class="text-danger"
+                                                        id="result-{{ job.id }}">{{ job.get_last_build_result }}</span>
                                         {% endif %}
                                     </td>
                                     <td>{{ job.name }}</td>
-                                    <td>{{ job.get_last_success_build_time }}</td>
-                                    <td>{{ job.get_last_failure_build_time }}</td>
+                                    <td><span
+                                            id="last_success_time-{{ job.id }}">{{ job.get_last_success_build_time }}</span>
+                                    </td>
+                                    <td><span
+                                            id="last_failure_time-{{ job.id }}">{{ job.get_last_failure_build_time }}</span>
+                                    </td>
                                     <td>
 
                                         <button class="btn btn-sm btn-primary" type="button" id="build-{{ job.id }}"
@@ -115,8 +121,26 @@
     <!--Page specific-->
     <script type="text/javascript">
         function build(job_id) {
-            $('#build-'+job_id).css('display', 'none');
-            $('#process-'+job_id).css('display', 'block');
+            $('#build-' + job_id).css('display', 'none');
+            $('#process-' + job_id).css('display', 'block');
+            $.ajax({
+                type: "POST",
+                url: "/jenkins/build/" + job_id + "/",
+                data: '',
+                contentType: "application/json; charset=utf-8",
+                async: true,
+                success: function (data) {
+                    if (data['data']) {
+                    }
+                    else {
+                        $("#process-" + job_id).css('display', 'none');
+                        $("#build-" + job_id).css('display', 'block');
+                        alert('Jenkins 不存在 '+data['msg']+'，请先同步任务列表');
+                    }
+                },
+                error: function (data, xhr, status, error) {
+                }
+            });
         }
     </script>
 
@@ -126,10 +150,22 @@
             socket = new WebSocket("ws://" + window.location.host + "/ws/jenkins/");
             socket.onmessage = function (e) {
                 var data = $.parseJSON(e.data);
-                var build_no = data['build_no'];
+                var job_id = data['job_id'];
+                var last_success_time = data['last_success_time'];
+                var last_failure_time = data['last_failure_time'];
                 if (data['result'] == 'SUCCESS') {
-                    $("#process-"+build_no).css('display', 'none');
-                    $("#process-"+build_no).css('display', 'block');
+                    $("#process-" + job_id).css('display', 'none');
+                    $("#build-" + job_id).css('display', 'block');
+                    $("#result-" + job_id).text('成功');
+                    $("#result-" + job_id).attr('class', 'text-success');
+                    $("#last_success_time-" + job_id).text(last_success_time);
+                }
+                if (data['result'] == 'FAILURE') {
+                    $("#process-" + job_id).css('display', 'none');
+                    $("#build-" + job_id).css('display', 'block');
+                    $("#result-" + job_id).text('失败');
+                    $("#result-" + job_id).attr('class', 'text-danger');
+                    $("#last_failure_time-" + job_id).text(last_failure_time);
                 }
             };
             socket.onopen = function () {
