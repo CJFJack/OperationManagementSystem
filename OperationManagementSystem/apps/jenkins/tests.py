@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from jenkinsapi.jenkins import Jenkins
-from jenkinsapi.utils.crumb_requester import CrumbRequester
+# from jenkinsapi.jenkins import Jenkins
+# from jenkinsapi.utils.crumb_requester import CrumbRequester
 #
-# jenkins_url = 'http://127.0.0.1:8080/'
+# jenkins_url = 'http://192.168.88.120:8080/'
 # username = 'admin'
 # password = 'Python@123'
 # jenkins = Jenkins(jenkins_url, username=username, password=password,

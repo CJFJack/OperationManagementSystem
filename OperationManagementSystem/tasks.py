@@ -3,15 +3,15 @@
 from celery import Celery
 from jenkinsapi.jenkins import Jenkins
 from jenkinsapi.utils.crumb_requester import CrumbRequester
+import celeryconfig
 
-app = Celery('tasks',
-             broker='redis://192.168.88.120:6379/0',
-             backend='redis://192.168.88.120:6379/0')
+app = Celery()
+app.config_from_object(celeryconfig)
 
 
-@app.task(ignore_result=True)
+@app.task()
 def jenkins_build():
-    jenkins_url = 'http://127.0.0.1:8080/'
+    jenkins_url = 'http://192.168.88.102:8080/'
     username = 'admin'
     password = 'Python@123'
     jenkins = Jenkins(jenkins_url, username=username, password=password,
@@ -21,7 +21,7 @@ def jenkins_build():
                           password=password,
                       ))
 
-    params = {'min': '3'}
+    params = {'min': 3}
 
     job = jenkins['test-job']
     qi = job.invoke(build_params=params)
