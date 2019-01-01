@@ -19,3 +19,24 @@ def ws_message(message):
 # Connected to websocket.disconnect
 def ws_disconnect(message):
     Group("chat").discard(message.reply_channel)
+
+
+def ws_jenkins_connect(message):
+    # Accept the connection
+    message.reply_channel.send({"accept": True})
+    # Add to the chat group
+    Group("jenkins").add(message.reply_channel)
+
+
+def ws_jenkins_build(message):
+    group_name = message.content['group']
+    Group(group_name).send({
+        "text": json.dumps(message.content),
+    })
+
+
+def ws_jenkins_disconnect(message):
+    # Accept the connection
+    message.reply_channel.send({"accept": True})
+    # Add to the chat group
+    Group("jenkins").add(message.reply_channel)

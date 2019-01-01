@@ -120,4 +120,27 @@
         }
     </script>
 
+    <!-- websocket -->
+    <script>
+        function init_ws() {
+            socket = new WebSocket("ws://" + window.location.host + "/ws/jenkins/");
+            socket.onmessage = function (e) {
+                var data = $.parseJSON(e.data);
+                var build_no = data['build_no'];
+                if (data['result'] == 'SUCCESS') {
+                    $("#process-"+build_no).css('display', 'none');
+                    $("#process-"+build_no).css('display', 'block');
+                }
+            };
+            socket.onopen = function () {
+                socket.send("start ws connection");
+            };
+            if (socket.readyState == WebSocket.OPEN) socket.onopen();
+        }
+
+        $(document).ready(function () {
+            init_ws()
+        })
+    </script>
+
 {% endblock %}

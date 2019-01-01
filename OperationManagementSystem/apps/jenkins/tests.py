@@ -38,4 +38,4 @@ from django.test import TestCase
 
 from OperationManagementSystem.tasks import jenkins_build
 
-jenkins_build.delay()
+jenkins_build()

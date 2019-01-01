@@ -3,6 +3,7 @@
 from celery import Celery
 from jenkinsapi.jenkins import Jenkins
 from jenkinsapi.utils.crumb_requester import CrumbRequester
+from channels import Channel
 import celeryconfig
 
 app = Celery()
@@ -33,3 +34,6 @@ def jenkins_build():
     print build
     print build.get_console()
     print build._data['result']
+    if build._data['result'] == 'SUCCESS':
+        msg = {'group': 'jenkins', 'result': 'SUCCESS', 'build_no': build.buildno}
+        Channel("ws_jenkins_build").send(msg)
