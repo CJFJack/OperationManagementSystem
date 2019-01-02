@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render, reverse
 from django.views import generic
-from .models import JenkinsJobList
+from .models import JenkinsJobList, JenkinsBuildHistory
 from django.http import JsonResponse
 from OperationManagementSystem.tasks import jenkins_build
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-import json
+from django.shortcuts import render
 
 app_name = 'jenkins'
 
@@ -33,3 +32,12 @@ def build(request, job_id):
         return JsonResponse({'data': True, 'msg': ''})
     else:
         return JsonResponse({'data': False, 'msg': reason})
+
+
+@login_required(login_url='/login/')
+def job_history(request, job_id):
+    job_history = JenkinsBuildHistory.objects.filter(job_id=job_id)
+    if job_history:
+        return render(request, 'jenkins/jenkins_job_history.html', {'job_history': job_history})
+    else:
+        return render(request, 'jenkins/jenkins_job_history.html', {})

@@ -14,7 +14,7 @@ app.config_from_object(celeryconfig)
 
 # @app.task()
 def jenkins_build(job_name, job_id):
-    jenkins_url = 'http://192.168.88.102:8080/'
+    jenkins_url = 'http://127.0.0.1:8080/'
     username = 'admin'
     password = 'Python@123'
     job_obj = JenkinsJobList.objects.get(pk=job_id)
@@ -26,7 +26,7 @@ def jenkins_build(job_name, job_id):
                               password=password,
                           ))
 
-        params = {'min': 1}
+        params = {'min': 100}
 
         job = jenkins[job_name]
         qi = job.invoke(build_params=params)

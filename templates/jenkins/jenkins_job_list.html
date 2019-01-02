@@ -55,6 +55,7 @@
                                 <th>最后一次成功时间</th>
                                 <th>最后一次失败时间</th>
                                 <th>操作</th>
+                                <th>历史记录</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -76,7 +77,6 @@
                                             id="last_failure_time-{{ job.id }}">{{ job.get_last_failure_build_time }}</span>
                                     </td>
                                     <td>
-
                                         <button class="btn btn-sm btn-primary" type="button" id="build-{{ job.id }}"
                                                 style="display: {% if job.status == 2 %}block{% else %}none{% endif %};"
                                                 onclick="build({{ job.id }})">
@@ -90,6 +90,11 @@
                                                      aria-valuemax="100" style="width: 100%"></div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-danger" type="button" id="history-{{ job.id }}" href="{% url 'jenkins:job_history' job.id %}">
+                                            History
+                                        </a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -118,7 +123,7 @@
     <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
     <script type="text/javascript">$('#sampleTable').DataTable();</script>
 
-    <!--Page specific-->
+    <!--build-->
     <script type="text/javascript">
         function build(job_id) {
             $('#build-' + job_id).css('display', 'none');
@@ -135,7 +140,7 @@
                     else {
                         $("#process-" + job_id).css('display', 'none');
                         $("#build-" + job_id).css('display', 'block');
-                        alert('Jenkins 不存在 '+data['msg']+'，请先同步任务列表');
+                        alert('Jenkins 不存在 ' + data['msg'] + '，请先同步任务列表');
                     }
                 },
                 error: function (data, xhr, status, error) {
