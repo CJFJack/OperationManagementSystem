@@ -13,7 +13,7 @@ app.config_from_object(celeryconfig)
 
 
 # @app.task()
-def jenkins_build(job_name, job_id):
+def jenkins_build(job_name, job_id, params=None):
     jenkins_url = 'http://127.0.0.1:8080/'
     username = 'admin'
     password = 'Python@123'
@@ -25,11 +25,12 @@ def jenkins_build(job_name, job_id):
                               username=username,
                               password=password,
                           ))
-
-        params = {'min': 100}
-
         job = jenkins[job_name]
-        qi = job.invoke(build_params=params)
+        start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if params is not None:
+            qi = job.invoke(build_params=params)
+        else:
+            qi = job.invoke()
 
         if qi.is_queued() or qi.is_running():
             qi.block_until_complete()
@@ -38,9 +39,8 @@ def jenkins_build(job_name, job_id):
     except Exception as e:
         job_obj.status = 2
         job_obj.save()
-        return (False, e)
+        return False, str(e)
     else:
-        start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if build._data['result'] == 'SUCCESS':
             job_obj.status = 2
             job_obj.save()
@@ -49,6 +49,7 @@ def jenkins_build(job_name, job_id):
                    'last_success_time': job_obj.get_last_success_build_time(),
                    'last_failure_time': job_obj.get_last_failure_build_time()}
             Channel("ws_jenkins_build").send(msg)
+            return True, ''
         if build._data['result'] == 'FAILURE':
             job_obj.status = 2
             job_obj.save()
@@ -62,4 +63,4 @@ def jenkins_build(job_name, job_id):
                    'last_success_time': job_obj.get_last_success_build_time(),
                    'last_failure_time': job_obj.get_last_failure_build_time()}
             Channel("ws_jenkins_build").send(msg)
-            return (True, '')
+            return True, ''

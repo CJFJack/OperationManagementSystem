@@ -57,9 +57,19 @@
                             <tbody>
                             {% for h in job_history %}
                                 <tr>
+                                    <td>#{{ h.build_no }}</td>
+                                    <td>{{ h.build_start_time|date:"Y-m-d H:i:s" }}</td>
+                                    <td>{{ h.build_finish_time|date:"Y-m-d H:i:s" }}</td>
+                                    <td>{{ h.get_build_last_time }}</td>
+                                    <td class="{% if h.result == 1 %}text-success{% else %}text-danger{% endif %}">{{ h.get_result_display }}</td>
                                     <td>
-
+                                        {% if h.result == 0 %}
+                                            <button class="btn btn-sm btn-primary" id="console"
+                                                    onclick='console("{{ h.id }}", "{{ h.build_no }}")'>console
+                                            </button>
+                                        {% endif %}
                                     </td>
+                                    <input style="display: none;" id="console-{{ h.id }}" value="{{ h.console }}">
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -84,14 +94,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myModalLabel">
-                        <span id="history-title"></span><span>-历史记录</span>
+                        <span id="console-title"></span><span>-console</span>
                     </h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         &times;
                     </button>
                 </div>
                 <div class="modal-body">
-                    在这里添加一些文本
+                    <p id="console-content"></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -107,11 +117,19 @@
     <!-- Data table plugin-->
     <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
-    <script type="text/javascript">$('#sampleTable').DataTable();</script>
+    <script type="text/javascript">
+        $('#sampleTable').DataTable({
+            "order": [[1, "desc"]]
+        });
+    </script>
 
     <!--history-->
     <script type="text/javascript">
-        function history(job_id) {
+        function console(history_id, build_no, console) {
+            var console = $('#console-' + history_id).val();
+            //alert(console);
+            $('#console-title').text('#' + build_no);
+            $('#console-content').text(console);
             $('#myModal').modal('show');
         }
     </script>

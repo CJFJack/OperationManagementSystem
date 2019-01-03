@@ -46,5 +46,11 @@ class JenkinsBuildHistory(models.Model):
         verbose_name = u'jenkins构建历史记录'
         verbose_name_plural = verbose_name
 
+    def get_build_last_time(self):
+        """构建持续时间"""
+        seconds = (self.build_finish_time - self.build_start_time).seconds
+        m, s = divmod(seconds, 60)
+        return '%s分%s秒' % (m, s)
+
     def __str__(self):
         return self.job.name + '-' + self.get_result_display()

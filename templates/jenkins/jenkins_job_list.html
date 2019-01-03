@@ -3,6 +3,9 @@
 
 {% block content %}
 
+    <!-- 每30s刷新一次页面 -->
+    <meta http-equiv="refresh" content="30">
+
     {#        表格有数据时展示#}
     <div class="app-title">
         {#            页面简介区域#}
@@ -134,6 +137,7 @@
                 data: '',
                 contentType: "application/json; charset=utf-8",
                 async: true,
+                timeout: 40000,
                 success: function (data) {
                     if (data['data']) {
                     }

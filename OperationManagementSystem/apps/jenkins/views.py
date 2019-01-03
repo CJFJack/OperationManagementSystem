@@ -26,8 +26,7 @@ def build(request, job_id):
     job = JenkinsJobList.objects.get(pk=job_id)
     job.status = 1
     job.save()
-    result, reason = jenkins_build(job.name, job.id)
-    reason = str(reason[0])
+    result, reason = jenkins_build(job.name, job.id, params={'min': 2})
     if result:
         return JsonResponse({'data': True, 'msg': ''})
     else:
@@ -36,7 +35,7 @@ def build(request, job_id):
 
 @login_required(login_url='/login/')
 def job_history(request, job_id):
-    job_history = JenkinsBuildHistory.objects.filter(job_id=job_id)
+    job_history = JenkinsBuildHistory.objects.filter(job_id=job_id).order_by('-build_no')
     if job_history:
         return render(request, 'jenkins/jenkins_job_history.html', {'job_history': job_history})
     else:
