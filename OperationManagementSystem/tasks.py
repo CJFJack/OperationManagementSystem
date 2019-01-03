@@ -25,7 +25,10 @@ def jenkins_build(job_name, job_id, params=None):
                               username=username,
                               password=password,
                           ))
-        job = jenkins[job_name]
+        try:
+            job = jenkins[job_name]
+        except:
+            return False, 'jenkins 不存在 Job：' + job_name + '，请先同步任务列表！'
         start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if params is not None:
             qi = job.invoke(build_params=params)

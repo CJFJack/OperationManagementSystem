@@ -144,7 +144,7 @@
                     else {
                         $("#process-" + job_id).css('display', 'none');
                         $("#build-" + job_id).css('display', 'block');
-                        alert('Jenkins 不存在 ' + data['msg'] + '，请先同步任务列表');
+                        alert(data['msg']);
                     }
                 },
                 error: function (data, xhr, status, error) {
