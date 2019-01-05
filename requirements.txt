@@ -13,7 +13,5 @@ djangorestframework
 requests
 channels
 jenkinsapi
-redis
-celery
 
 

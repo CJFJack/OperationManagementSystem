@@ -1,18 +1,12 @@
 # -*- encoding: utf-8 -*-
 
-from celery import Celery
 from jenkinsapi.jenkins import Jenkins
 from jenkinsapi.utils.crumb_requester import CrumbRequester
 from channels import Channel
 from OperationManagementSystem.apps.jenkins.models import JenkinsJobList, JenkinsBuildHistory
-import celeryconfig
 import datetime
 
-app = Celery()
-app.config_from_object(celeryconfig)
 
-
-@app.task()
 def jenkins_build(job_id, params=None):
     jenkins_url = 'http://localjenkins:8080/'
     username = 'admin'
@@ -30,7 +24,9 @@ def jenkins_build(job_id, params=None):
         try:
             job = jenkins[job_obj.name]
         except:
-            return {'success': False, 'msg': 'jenkins 不存在 Job：' + job_obj.name + '，请先同步任务列表！'}
+            job_obj.status = 2
+            job_obj.save()
+            return {'success': False, 'msg': 'jenkinsJobDoesNotExist：' + str(job_obj.name) + '，请先同步任务列表！'}
         start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if params is not None:
             qi = job.invoke(build_params=params)
