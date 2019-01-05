@@ -123,8 +123,9 @@ REST_FRAMEWORK = {
     )
 }
 
-REDIS_URL = 'redis://192.168.88.120:6379/0'
-REDIS_HOST = '192.168.88.120'
+REDIS_URL = 'redis://localredis:6379/0'
+REDIS_BACKEND_URL = 'redis://localredis:6379/1'
+REDIS_HOST = 'localredis'
 REDIS_PORT = 6379
 
 CHANNEL_LAYERS = {

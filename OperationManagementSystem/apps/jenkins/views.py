@@ -23,14 +23,8 @@ class JenkinsJobListView(generic.ListView):
 @login_required(login_url='/login/')
 @csrf_exempt
 def build(request, job_id):
-    job = JenkinsJobList.objects.get(pk=job_id)
-    job.status = 1
-    job.save()
-    result, reason = jenkins_build(job.name, job.id, params={'min': 2})
-    if result:
-        return JsonResponse({'data': True, 'msg': ''})
-    else:
-        return JsonResponse({'data': False, 'msg': reason})
+    jenkins_build.delay(job_id, params={'min': 2})
+    return JsonResponse({'data': True, 'msg': ''})
 
 
 @login_required(login_url='/login/')

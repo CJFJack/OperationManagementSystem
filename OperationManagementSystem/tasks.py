@@ -12,12 +12,14 @@ app = Celery()
 app.config_from_object(celeryconfig)
 
 
-# @app.task()
-def jenkins_build(job_name, job_id, params=None):
-    jenkins_url = 'http://127.0.0.1:8080/'
+@app.task()
+def jenkins_build(job_id, params=None):
+    jenkins_url = 'http://localjenkins:8080/'
     username = 'admin'
     password = 'Python@123'
     job_obj = JenkinsJobList.objects.get(pk=job_id)
+    job_obj.status = 1
+    job_obj.save()
     try:
         jenkins = Jenkins(jenkins_url, username=username, password=password,
                           requester=CrumbRequester(
@@ -26,9 +28,9 @@ def jenkins_build(job_name, job_id, params=None):
                               password=password,
                           ))
         try:
-            job = jenkins[job_name]
+            job = jenkins[job_obj.name]
         except:
-            return False, 'jenkins 不存在 Job：' + job_name + '，请先同步任务列表！'
+            return {'success': False, 'msg': 'jenkins 不存在 Job：' + job_obj.name + '，请先同步任务列表！'}
         start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if params is not None:
             qi = job.invoke(build_params=params)
@@ -42,7 +44,7 @@ def jenkins_build(job_name, job_id, params=None):
     except Exception as e:
         job_obj.status = 2
         job_obj.save()
-        return False, str(e)
+        return {'success': False, 'msg': str(e)}
     else:
         if build._data['result'] == 'SUCCESS':
             job_obj.status = 2
@@ -52,7 +54,7 @@ def jenkins_build(job_name, job_id, params=None):
                    'last_success_time': job_obj.get_last_success_build_time(),
                    'last_failure_time': job_obj.get_last_failure_build_time()}
             Channel("ws_jenkins_build").send(msg)
-            return True, ''
+            return {'success': True, 'msg': ''}
         if build._data['result'] == 'FAILURE':
             job_obj.status = 2
             job_obj.save()
@@ -66,4 +68,4 @@ def jenkins_build(job_name, job_id, params=None):
                    'last_success_time': job_obj.get_last_success_build_time(),
                    'last_failure_time': job_obj.get_last_failure_build_time()}
             Channel("ws_jenkins_build").send(msg)
-            return True, ''
+            return {'success': True, 'msg': ''}

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from OperationManagementSystem.settings import REDIS_URL
+from OperationManagementSystem.settings import REDIS_URL, REDIS_BACKEND_URL
 
 CELERY_TIMEZONE = 'Asia/Shanghai'
 BROKER_URL = REDIS_URL
 CELERY_IMPORTS = ('tasks', )
 
-CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_BACKEND_URL
 CELERY_RESULT_PERSISTENT = True
 CELERY_TASK_RESULT_EXPIRES = None
 
