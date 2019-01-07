@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.views import generic
 from .models import JenkinsJobList, JenkinsBuildHistory
 from django.http import JsonResponse
-from OperationManagementSystem.apps.jenkins.utils import jenkins_build
+from OperationManagementSystem.apps.jenkins.utils import jenkins_build, func_sync_jenkins_jobs
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -37,3 +37,23 @@ def job_history(request, job_id):
         return render(request, 'jenkins/jenkins_job_history.html', {'job_history': job_history})
     else:
         return render(request, 'jenkins/jenkins_job_history.html', {})
+
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def sync_jenkins_jobs(request):
+    try:
+        jobs = func_sync_jenkins_jobs()
+        if jobs:
+            for j in jobs:
+                if j not in [x.name for x in JenkinsJobList.objects.all()]:
+                    JenkinsJobList.objects.create(name=j)
+            for x in JenkinsJobList.objects.all():
+                if x.name not in jobs:
+                    x.delete()
+            return JsonResponse({'success': True, 'msg': '同步jenkins任务成功！'})
+        else:
+            return JsonResponse({'success': False, 'msg': 'Jenksins上还没有任务！'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'msg': '同步失败！'+str(e)})
+

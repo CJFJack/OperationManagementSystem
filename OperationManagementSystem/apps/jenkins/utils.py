@@ -7,20 +7,25 @@ from OperationManagementSystem.apps.jenkins.models import JenkinsJobList, Jenkin
 import datetime
 
 
-def jenkins_build(job_id, params=None):
-    jenkins_url = 'http://localjenkins:8080/'
+def jenkins_connection():
+    jenkins_url = 'http://127.0.0.1:8080/'
     username = 'admin'
     password = 'Python@123'
+    jenkins = Jenkins(jenkins_url, username=username, password=password,
+                      requester=CrumbRequester(
+                          baseurl=jenkins_url,
+                          username=username,
+                          password=password,
+                      ))
+    return jenkins
+
+
+def jenkins_build(job_id, params=None):
     job_obj = JenkinsJobList.objects.get(pk=job_id)
     job_obj.status = 1
     job_obj.save()
     try:
-        jenkins = Jenkins(jenkins_url, username=username, password=password,
-                          requester=CrumbRequester(
-                              baseurl=jenkins_url,
-                              username=username,
-                              password=password,
-                          ))
+        jenkins = jenkins_connection()
         try:
             job = jenkins[job_obj.name]
         except:
@@ -45,7 +50,8 @@ def jenkins_build(job_id, params=None):
         if build._data['result'] == 'SUCCESS':
             job_obj.status = 2
             job_obj.save()
-            JenkinsBuildHistory.objects.create(build_no=build.buildno, build_start_time=start_time, result=1, job=job_obj)
+            JenkinsBuildHistory.objects.create(build_no=build.buildno, build_start_time=start_time, result=1,
+                                               job=job_obj)
             msg = {'group': 'jenkins', 'result': 'SUCCESS', 'job_id': job_id,
                    'last_success_time': job_obj.get_last_success_build_time(),
                    'last_failure_time': job_obj.get_last_failure_build_time()}
@@ -65,3 +71,8 @@ def jenkins_build(job_id, params=None):
                    'last_failure_time': job_obj.get_last_failure_build_time()}
             Channel("ws_jenkins_build").send(msg)
             return {'success': True, 'msg': ''}
+
+
+def func_sync_jenkins_jobs():
+    jenkins = jenkins_connection()
+    return jenkins.keys()

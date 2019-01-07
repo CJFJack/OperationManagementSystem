@@ -39,7 +39,7 @@
     </div>
     {#        按钮区域#}
     <div>
-        <button class="btn btn-success" type="button">同步任务列表
+        <button class="btn btn-success" type="button" onclick="sync_jenkins_jobs()">同步任务列表
         </button>
     </div>
     {% if jenkins_list %}
@@ -186,6 +186,33 @@
         $(document).ready(function () {
             init_ws()
         })
+    </script>
+    
+    <!-- 同步jenkins任务列表-->
+    <script>
+        function sync_jenkins_jobs() {
+            //jQuery('#loading').showLoading();
+            $.ajax({
+                type: "POST",
+                url: "/jenkins/sync_jenkins_jobs/",
+                data: '',
+                contentType: "application/json; charset=utf-8",
+                async: true,
+                success: function (data) {
+                    if (data['success']) {
+                        location.reload();
+                    }
+                    else {
+                        jQuery('#loading').hideLoading();
+                        alert(data['msg']);
+                    }
+                },
+                error: function (data, xhr, status, error) {
+                    jQuery('#loading').hideLoading();
+                    alert(data['msg']);
+                }
+            });
+        }
     </script>
 
 {% endblock %}

@@ -113,7 +113,7 @@ class Application(models.Model):
 
 class SLB(models.Model):
     instance_id = models.CharField(max_length=50, verbose_name=u'实例ID')
-    name = models.CharField(max_length=30, verbose_name=u'实例名称')
+    name = models.CharField(max_length=50, verbose_name=u'实例名称')
     status = models.CharField(max_length=30, verbose_name=u'实例状态')
     ip = models.GenericIPAddressField(protocol='IPv4', verbose_name=u'IP地址')
     network_type = models.CharField(max_length=10, null=True, blank=True, verbose_name=u'网络类型')

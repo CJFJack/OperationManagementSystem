@@ -3,18 +3,18 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 #
-# from jenkinsapi.jenkins import Jenkins
-# from jenkinsapi.utils.crumb_requester import CrumbRequester
-#
-# jenkins_url = 'http://localjenkins:8080/'
-# username = 'admin'
-# password = 'Python@123'
-# jenkins = Jenkins(jenkins_url, username=username, password=password,
-#                   requester=CrumbRequester(
-#                       baseurl=jenkins_url,
-#                       username=username,
-#                       password=password,
-#                   ))
+from jenkinsapi.jenkins import Jenkins
+from jenkinsapi.utils.crumb_requester import CrumbRequester
+
+jenkins_url = 'http://127.0.0.1:8080/'
+username = 'admin'
+password = 'Python@123'
+jenkins = Jenkins(jenkins_url, username=username, password=password,
+                  requester=CrumbRequester(
+                      baseurl=jenkins_url,
+                      username=username,
+                      password=password,
+                  ))
 #
 # params = {'min': 1}
 #
@@ -48,3 +48,8 @@ from django.test import TestCase
 #
 # print jenkins_build.delay(1)
 
+jobName = jenkins.keys()[0]  # get the first job
+
+config = jenkins[jobName].get_config()
+
+print(jenkins.keys())
